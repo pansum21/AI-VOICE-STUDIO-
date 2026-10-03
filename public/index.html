@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Free AI Voice Studio - 320+ Neural Voices</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 28, 45, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --tag-bg: rgba(99, 102, 241, 0.15);
+      --tag-border: rgba(99, 102, 241, 0.3);
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+    }
+
+    header {
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .badge-count {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge-free {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    main {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      flex: 1;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Text Input Area */
+    .textarea-container {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      background: rgba(11, 15, 25, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .text-stats {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Voice Tabs & Filter */
+    .voice-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-filter {
+      background: rgba(11, 15, 25, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .input-filter:focus {
+      border-color: var(--accent);
+    }
+
+    select.input-filter {
+      cursor: pointer;
+    }
+
+    /* Voice Grid */
+    .voice-grid-container {
+      max-height: 290px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 18px;
+    }
+
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .voice-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .voice-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .voice-card.active {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.15);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Voice Preview Play Button */
+    .btn-preview-play {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .btn-preview-play:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      transform: scale(1.08);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .btn-preview-play.playing {
+      background: var(--accent);
+      color: white;
+      border-color: #818cf8;
+      animation: pulse-glow 1.2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+
+    /* Small Star Toggle Button */
+    .btn-star {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      padding: 0;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .btn-star:hover {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.5);
+      color: #fbbf24;
+      transform: scale(1.12);
+    }
+
+    .btn-star.starred {
+      background: rgba(251, 191, 36, 0.2);
+      border-color: #fbbf24;
+      color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+    }
+
+    .voice-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .voice-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .voice-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .voice-counterpart {
+      font-size: 0.7rem;
+      color: #818cf8;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .voice-locale {
+      font-size: 0.72rem;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .voice-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Controls (Sliders) */
+    /* Controls (Sliders, Quality & Mood) */
+    .controls-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.2fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 1050px) {
+      .controls-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .controls-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-group {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .control-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-generate {
+      flex: 1;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-generate:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Active Player Area */
+    .player-section {
+      margin-top: 18px;
+      padding: 16px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 12px;
+      display: none;
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .player-info {
+      font-size: 0.85rem;
+    }
+
+    .player-info strong {
+      color: #818cf8;
+    }
+
+    audio {
+      width: 100%;
+      height: 38px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn-download {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-download:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* History Sidebar & Bulk Action Bar */
+    .history-bulk-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .history-select-header {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .history-select-header label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 650px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px;
+      transition: all 0.2s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .history-item.selected {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .item-checkbox {
+      margin-top: 3px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .history-item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-voice {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge-quality {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-weight: 500;
+      margin-left: 6px;
+    }
+
+    .history-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-tiny {
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-tiny:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: rgba(239, 68, 68, 0.35) !important;
+      color: #fca5a5 !important;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.3) !important;
+      border-color: rgba(239, 68, 68, 0.6) !important;
+      color: #ffffff !important;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Free AI Voice Studio</h1>
+      </div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <a href="/editor.html" target="_blank" class="tab-btn" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #c7d2fe; font-size: 0.82rem; padding: 6px 14px; border-radius: 8px;">
+        ✂️ Open Audio Editor
+      </a>
+      <span class="badge-count" id="totalVoiceCount">322 Voices</span>
+      <span class="badge-free">100% Free & Unlimited</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Column: Generator -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <span>Script / Prompt</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-tiny" id="cleanScriptBtn" onclick="cleanScriptPrompt()" title="Clean subtitle markers like [संगीत], [Music], timestamps, and bracketed noise">
+              🧹 Clean [संगीत] Tags
+            </button>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Ctrl+Enter to generate</span>
+          </div>
+        </div>
+
+        <div class="textarea-container">
+          <textarea id="promptText" placeholder="Enter any text or story here to synthesize speech...">In a quiet village where the shadows whispered secrets, an ancient mystery was waiting to be uncovered.</textarea>
+          <div class="text-stats">
+            <span id="charCount">0 characters</span>
+            <span id="wordCount">0 words</span>
+          </div>
+        </div>
+
+        <!-- Voice Selection Tabs & Filters -->
+        <div class="voice-nav">
+          <div class="tabs">
+            <button class="tab-btn active" id="tabAll" onclick="switchTab('all')">🌐 All 320+ Voices</button>
+            <button class="tab-btn" id="tabFeatured" onclick="switchTab('featured')">⭐ My Featured Voices (<span id="featuredCount">0</span>)</button>
+          </div>
+          <span id="voiceCountDisplay" style="font-size: 0.8rem; color: var(--text-muted);">322 voices</span>
+        </div>
+
+        <!-- Filter Bar (active when browsing all voices) -->
+        <div class="filter-bar" id="filterBar" style="display: grid;">
+          <input type="text" class="input-filter" id="searchInput" placeholder="Search by voice name or accent (e.g. Indian, British, Guy)...">
+          <select class="input-filter" id="langSelect">
+            <option value="ALL">All Languages</option>
+            <option value="en">English (All Regions)</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-IN">English (India)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="en-AU">English (Australia)</option>
+            <option value="hi">Hindi (India)</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="ja">Japanese</option>
+          </select>
+          <select class="input-filter" id="genderSelect">
+            <option value="ALL">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <!-- Voice Grid with scroll -->
+        <div class="voice-grid-container">
+          <div class="voice-grid" id="voiceGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="control-group">
+            <div class="control-label-row">
+              <span>Speech Speed (Rate)</span>
+              <span class="control-value" id="rateVal">1.0x</span>
+            </div>
+            <input type="range" id="rateSlider" min="-30" max="50" value="0">
+          </div>
+          <div class="control-group">
+            <div class="control-label-row">
+              <span>Voice Pitch</span>
+              <span class="control-value" id="pitchVal">Normal</span>
+            </div>
+            <input type="range" id="pitchSlider" min="-30" max="30" value="0">
+          </div>
+          <div class="control-group">
+            <div class="control-label-row">
+              <span>Audio Quality</span>
+              <span class="control-value" id="qualityLabelBadge" style="color: #34d399; font-size: 0.78rem;">High (96k)</span>
+            </div>
+            <select id="qualitySelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
+              <option value="high" selected>✨ High Quality (96k MP3)</option>
+              <option value="standard">⚡ Basic / Standard (48k MP3)</option>
+              <option value="opus">💎 Ultra HD Voice (Opus)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <div class="control-label-row">
+              <span>Tone & Expression</span>
+              <span class="control-value" id="moodLabelBadge" style="color: #34d399; font-size: 0.78rem;">🎙️ Pure Human Studio</span>
+            </div>
+            <select id="moodSelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
+              <option value="studio" selected>🎙️ Pure Human Studio (100% Natural)</option>
+              <option value="suspense">🎭 Dramatic & Suspense (Stories)</option>
+              <option value="horror">🌑 Deep Mystery & Thriller</option>
+              <option value="story">📖 Engaging Storyteller</option>
+              <option value="fast">⚡ Action Thriller (High Tempo)</option>
+              <option value="normal">🎙️ Conversational / Neutral</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-generate" id="generateBtn">
+            <div class="spinner" id="spinner"></div>
+            <span id="btnText">Generate Audio</span>
+          </button>
+        </div>
+
+        <!-- Audio Player Section -->
+        <div class="player-section" id="playerSection">
+          <div class="player-header">
+            <div class="player-info" id="playerInfo">Ready</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <a class="btn-download" id="editAudioBtn" href="/editor.html" target="_blank" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #c7d2fe; text-decoration: none;">
+                ✂️ Edit Audio
+              </a>
+              <a class="btn-download" id="downloadBtn" href="#" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Audio
+              </a>
+            </div>
+          </div>
+          <audio id="audioPlayer" controls autoplay></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Generation History -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <span>Recent Generations</span>
+          <button class="btn-tiny" id="refreshHistory">Refresh</button>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <div class="history-bulk-bar" id="bulkBar">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="bulkSelectAll" onchange="toggleSelectAll(this.checked)" style="accent-color: var(--accent); cursor: pointer; width: 15px; height: 15px;">
+            <span style="font-size: 0.8rem; font-weight: 500;">
+              <span id="selectedCount">0</span> selected
+            </span>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-tiny" onclick="downloadSelected()" title="Download selected audio files" style="display: flex; align-items: center; gap: 4px;">
+              📥 Download
+            </button>
+            <button class="btn-tiny btn-danger" onclick="deleteSelected()" title="Delete selected audio files" style="display: flex; align-items: center; gap: 4px;">
+              🗑 Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- History items select header -->
+        <div class="history-select-header" id="historySelectHeader">
+          <label>
+            <input type="checkbox" id="headerSelectAll" onchange="toggleSelectAll(this.checked)" style="accent-color: var(--accent); cursor: pointer; width: 15px; height: 15px;">
+            <span>Select All</span>
+          </label>
+          <span id="historyItemsCount">0 items</span>
+        </div>
+
+        <div class="history-list" id="historyList">
+          <p style="color: var(--text-muted); font-size: 0.85rem;">No generations yet. Click Generate to create audio.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let allVoices = [];
+    let currentTab = 'all';
+    let selectedVoiceId = localStorage.getItem('last_selected_voice') || 'en-US-AndrewMultilingualNeural';
+    let starredVoiceIds = new Set(JSON.parse(localStorage.getItem('my_featured_voices') || '[]'));
+
+    const promptText = document.getElementById('promptText');
+    const charCount = document.getElementById('charCount');
+    const wordCount = document.getElementById('wordCount');
+    const voiceGrid = document.getElementById('voiceGrid');
+    const rateSlider = document.getElementById('rateSlider');
+    const pitchSlider = document.getElementById('pitchSlider');
+    const rateVal = document.getElementById('rateVal');
+    const pitchVal = document.getElementById('pitchVal');
+    const generateBtn = document.getElementById('generateBtn');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+    const playerSection = document.getElementById('playerSection');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playerInfo = document.getElementById('playerInfo');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const editAudioBtn = document.getElementById('editAudioBtn');
+    const historyList = document.getElementById('historyList');
+    const filterBar = document.getElementById('filterBar');
+    const searchInput = document.getElementById('searchInput');
+    const langSelect = document.getElementById('langSelect');
+    const genderSelect = document.getElementById('genderSelect');
+    const voiceCountDisplay = document.getElementById('voiceCountDisplay');
+    const totalVoiceCount = document.getElementById('totalVoiceCount');
+
+    function cleanScriptPrompt() {
+      const original = promptText.value;
+      const cleaned = original
+        .normalize('NFC')
+        .replace(/\d{1,2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,\.]\d{3}/g, '')
+        .replace(/^\s*\d+\s*$/gm, '')
+        .replace(/[\[\(]?\b\d{1,2}:\d{2}(?::\d{2})?\b[\]\)]?/g, '')
+        .replace(/\[\s*(?:संगीत|music|applause|laughter|हंसी|तालियां|sound|cheering|background\s*music|intro|outro|chorus|verse\s*\d*)\s*\]/gi, '')
+        .replace(/\(\s*(?:संगीत|music|applause|laughter|हंसी|तालियां|sound|cheering|background\s*music|intro|outro|chorus|verse\s*\d*)\s*\)/gi, '')
+        .replace(/[ \t]+/g, ' ')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+      promptText.value = cleaned;
+      updateStats();
+    }
+
+    function updateStats() {
+      const text = promptText.value;
+      charCount.textContent = `${text.length} characters`;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words} words`;
+    }
+    promptText.addEventListener('input', updateStats);
+    updateStats();
+
+    // Rate / Pitch formatting
+    rateSlider.addEventListener('input', () => {
+      const v = parseInt(rateSlider.value, 10);
+      const mult = (1 + v / 100).toFixed(2);
+      rateVal.textContent = v === 0 ? '1.0x (Natural)' : `${mult}x`;
+    });
+
+    pitchSlider.addEventListener('input', () => {
+      const v = parseInt(pitchSlider.value, 10);
+      pitchVal.textContent = v === 0 ? 'Natural Studio' : (v > 0 ? `+${v}Hz` : `${v}Hz`);
+    });
+
+    function updateFeaturedCount() {
+      const el = document.getElementById('featuredCount');
+      if (el) el.textContent = starredVoiceIds.size;
+    }
+
+    function toggleStar(e, voiceId) {
+      e.stopPropagation();
+      if (starredVoiceIds.has(voiceId)) {
+        starredVoiceIds.delete(voiceId);
+      } else {
+        starredVoiceIds.add(voiceId);
+      }
+      localStorage.setItem('my_featured_voices', JSON.stringify([...starredVoiceIds]));
+      updateFeaturedCount();
+      renderVoices();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabFeatured').classList.toggle('active', tab === 'featured');
+      document.getElementById('tabAll').classList.toggle('active', tab === 'all');
+      filterBar.style.display = tab === 'all' ? 'grid' : 'none';
+      renderVoices();
+    }
+
+    function renderVoices() {
+      voiceGrid.innerHTML = '';
+      let list = allVoices;
+
+      if (currentTab === 'featured') {
+        list = allVoices.filter(v => starredVoiceIds.has(v.id));
+        voiceCountDisplay.textContent = `${list.length} featured voice${list.length === 1 ? '' : 's'}`;
+
+        if (list.length === 0) {
+          voiceGrid.innerHTML = `
+            <div style="grid-column: 1/-1; padding: 40px 20px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--card-border); border-radius: 14px;">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">⭐</div>
+              <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; color: var(--text);">Your Featured Voices is Empty</div>
+              <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 440px; margin: 0 auto 16px; line-height: 1.5;">
+                You have full control! Go to <strong>All 320+ Voices</strong> and click the small <strong>☆ Star</strong> on any voice to pin it into your Featured list.
+              </p>
+              <button class="tab-btn" onclick="switchTab('all')" style="display: inline-block; background: var(--accent); color: white; padding: 8px 20px;">Browse All 320+ Voices</button>
+            </div>
+          `;
+          return;
+        }
+      } else {
+        const query = searchInput.value.toLowerCase().trim();
+        const lang = langSelect.value;
+        const gender = genderSelect.value;
+
+        list = allVoices.filter(v => {
+          if (gender !== 'ALL' && v.gender !== gender) return false;
+          if (lang !== 'ALL') {
+            if (lang.includes('-')) {
+              if (v.locale !== lang) return false;
+            } else {
+              if (!v.locale.startsWith(lang)) return false;
+            }
+          }
+          if (query) {
+            const matchName = v.name.toLowerCase().includes(query);
+            const matchLocale = v.localeName.toLowerCase().includes(query);
+            const matchTag = (v.tag || '').toLowerCase().includes(query);
+            const matchCounterpart = (v.counterpart || '').toLowerCase().includes(query);
+            if (!matchName && !matchLocale && !matchTag && !matchCounterpart) return false;
+          }
+          return true;
+        });
+
+        voiceCountDisplay.textContent = `${list.length} voice${list.length === 1 ? '' : 's'}`;
+
+        if (list.length === 0) {
+          voiceGrid.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; grid-column: 1/-1; padding: 20px; text-align: center;">No voices match your search query.</p>';
+          return;
+        }
+      }
+
+      list.forEach(voice => {
+        const card = document.createElement('div');
+        card.className = `voice-card ${voice.id === selectedVoiceId ? 'active' : ''}`;
+        
+        let badgeHtml = '';
+        if (voice.counterpart) {
+          badgeHtml = `<span class="voice-counterpart">${voice.counterpart}</span>`;
+        } else {
+          badgeHtml = `<span class="voice-locale">${voice.gender}, ${voice.localeName.split(' (')[0]}</span>`;
+        }
+
+        const isPlaying = voice.id === currentPlayingVoiceId;
+        const playIcon = isPlaying
+          ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+          : `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+
+        const isStarred = starredVoiceIds.has(voice.id);
+        const starIcon = isStarred ? '★' : '☆';
+
+        card.innerHTML = `
+          <button class="btn-preview-play ${isPlaying ? 'playing' : ''}" data-voice-id="${voice.id}" title="${isPlaying ? 'Stop Preview' : 'Listen Preview'}" onclick="togglePreview(event, '${voice.id}')">
+            ${playIcon}
+          </button>
+          <div class="voice-card-content">
+            <div class="voice-card-header">
+              <span class="voice-name">${voice.name}</span>
+              ${badgeHtml}
+            </div>
+            <div class="voice-desc">${voice.tag || voice.localeName}</div>
+          </div>
+          <button class="btn-star ${isStarred ? 'starred' : ''}" data-voice-id="${voice.id}" title="${isStarred ? 'Remove from Featured' : 'Add to Featured'}" onclick="toggleStar(event, '${voice.id}')">
+            ${starIcon}
+          </button>
+        `;
+        card.setAttribute('data-voice-id', voice.id);
+        card.onclick = () => {
+          document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          selectedVoiceId = voice.id;
+          localStorage.setItem('last_selected_voice', voice.id);
+        };
+        voiceGrid.appendChild(card);
+      });
+    }
+
+    // Voice Preview Audio Player
+    let currentPreviewAudio = null;
+    let currentPlayingVoiceId = null;
+
+    function togglePreview(e, voiceId) {
+      e.stopPropagation();
+
+      // If already playing this voice, stop it
+      if (currentPlayingVoiceId === voiceId && currentPreviewAudio) {
+        currentPreviewAudio.pause();
+        currentPreviewAudio = null;
+        currentPlayingVoiceId = null;
+        updatePreviewButtons();
+        return;
+      }
+
+      // Stop any other currently playing preview
+      if (currentPreviewAudio) {
+        currentPreviewAudio.pause();
+        currentPreviewAudio = null;
+      }
+
+      currentPlayingVoiceId = voiceId;
+      updatePreviewButtons();
+
+      const audio = new Audio(`/api/preview?voiceId=${encodeURIComponent(voiceId)}`);
+      currentPreviewAudio = audio;
+
+      audio.onplay = () => {
+        updatePreviewButtons();
+      };
+
+      audio.onended = () => {
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      };
+
+      audio.onerror = () => {
+        console.error('Failed to load preview for voice:', voiceId);
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      };
+
+      audio.play().catch(err => {
+        console.error('Audio play error:', err);
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      });
+    }
+
+    function updatePreviewButtons() {
+      document.querySelectorAll('.btn-preview-play').forEach(btn => {
+        const vId = btn.getAttribute('data-voice-id');
+        if (vId === currentPlayingVoiceId) {
+          btn.classList.add('playing');
+          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+          btn.title = "Stop Preview";
+        } else {
+          btn.classList.remove('playing');
+          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+          btn.title = "Listen Preview";
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', renderVoices);
+    langSelect.addEventListener('change', renderVoices);
+    genderSelect.addEventListener('change', renderVoices);
+
+    // Fetch and render voices
+    async function loadVoices() {
+      try {
+        const res = await fetch('/api/voices');
+        allVoices = await res.json();
+        totalVoiceCount.textContent = `${allVoices.length} Voices`;
+        if (allVoices.length > 0 && !allVoices.some(v => v.id === selectedVoiceId)) {
+          selectedVoiceId = allVoices[0].id;
+        }
+        updateFeaturedCount();
+        renderVoices();
+      } catch (err) {
+        console.error('Failed to load voices:', err);
+      }
+    }
+
+    const qualitySelect = document.getElementById('qualitySelect');
+    const qualityLabelBadge = document.getElementById('qualityLabelBadge');
+
+    qualitySelect.addEventListener('change', () => {
+      const val = qualitySelect.value;
+      if (val === 'high') {
+        qualityLabelBadge.textContent = 'High (96k)';
+        qualityLabelBadge.style.color = '#34d399';
+      } else if (val === 'standard') {
+        qualityLabelBadge.textContent = 'Basic (48k)';
+        qualityLabelBadge.style.color = '#fbbf24';
+      } else if (val === 'opus') {
+        qualityLabelBadge.textContent = 'Opus HD';
+        qualityLabelBadge.style.color = '#818cf8';
+      }
+    });
+
+    const moodSelect = document.getElementById('moodSelect');
+    const moodLabelBadge = document.getElementById('moodLabelBadge');
+
+    moodSelect.addEventListener('change', () => {
+      const val = moodSelect.value;
+      if (val === 'suspense') {
+        moodLabelBadge.textContent = '🎭 Suspense';
+        moodLabelBadge.style.color = '#818cf8';
+        rateSlider.value = -4;
+        pitchSlider.value = 0;
+      } else if (val === 'horror') {
+        moodLabelBadge.textContent = '🌑 Mystery';
+        moodLabelBadge.style.color = '#f87171';
+        rateSlider.value = -7;
+        pitchSlider.value = 0;
+      } else if (val === 'story') {
+        moodLabelBadge.textContent = '📖 Story';
+        moodLabelBadge.style.color = '#60a5fa';
+        rateSlider.value = -2;
+        pitchSlider.value = 0;
+      } else if (val === 'fast') {
+        moodLabelBadge.textContent = '⚡ Thriller';
+        moodLabelBadge.style.color = '#f59e0b';
+        rateSlider.value = 8;
+        pitchSlider.value = 0;
+      } else {
+        moodLabelBadge.textContent = '🎙️ Pure Studio';
+        moodLabelBadge.style.color = '#34d399';
+        rateSlider.value = 0;
+        pitchSlider.value = 0;
+      }
+      rateSlider.dispatchEvent(new Event('input'));
+      pitchSlider.dispatchEvent(new Event('input'));
+    });
+
+    // Generate Audio
+    async function generateAudio() {
+      const text = promptText.value.trim();
+      if (!text) {
+        alert('Please enter some text to generate audio.');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Synthesizing Story & Audio...';
+
+      const rateNum = parseInt(rateSlider.value, 10);
+      const rateStr = rateNum === 0 ? 'default' : (rateNum > 0 ? `+${rateNum}%` : `${rateNum}%`);
+
+      const pitchNum = parseInt(pitchSlider.value, 10);
+      const pitchStr = pitchNum === 0 ? 'default' : (pitchNum > 0 ? `+${pitchNum}Hz` : `${pitchNum}Hz`);
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            voiceId: selectedVoiceId,
+            rate: rateStr,
+            pitch: pitchStr,
+            quality: qualitySelect.value,
+            mood: moodSelect.value
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to synthesize audio');
+        }
+
+        const audio = data.audio;
+        playerSection.style.display = 'block';
+        audioPlayer.src = audio.url;
+        audioPlayer.play().catch(() => {});
+        playerInfo.innerHTML = `<strong>${audio.voiceName}</strong> <span class="badge-quality">${audio.mood || 'Suspense'}</span> <span class="badge-quality">${audio.quality || 'MP3'}</span> (${audio.sizeKb} KB)`;
+        downloadBtn.href = audio.downloadUrl;
+        downloadBtn.download = audio.filename;
+        if (editAudioBtn) {
+          editAudioBtn.href = `/editor.html?file=${encodeURIComponent(audio.filename)}`;
+        }
+
+        loadHistory();
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      } finally {
+        generateBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Generate Audio';
+      }
+    }
+
+    generateBtn.addEventListener('click', generateAudio);
+    promptText.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        generateAudio();
+      }
+    });
+
+    function playHistoryItem(url, voiceName, mood, quality, sizeKb, downloadUrl, filename) {
+      playerSection.style.display = 'block';
+      audioPlayer.src = decodeURIComponent(url);
+      audioPlayer.play().catch(() => {});
+      const moodText = decodeURIComponent(mood || '');
+      const moodHtml = moodText ? `<span class="badge-quality">${moodText}</span> ` : '';
+      playerInfo.innerHTML = `<strong>${decodeURIComponent(voiceName)}</strong> ${moodHtml}<span class="badge-quality">${decodeURIComponent(quality)}</span> (${sizeKb} KB)`;
+      downloadBtn.href = decodeURIComponent(downloadUrl);
+      downloadBtn.download = decodeURIComponent(filename);
+      if (editAudioBtn) {
+        editAudioBtn.href = `/editor.html?file=${encodeURIComponent(decodeURIComponent(filename))}`;
+      }
+      playerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function onItemCheckChange(e) {
+      const checkbox = e.target;
+      const itemCard = checkbox.closest('.history-item');
+      if (itemCard) {
+        itemCard.classList.toggle('selected', checkbox.checked);
+      }
+      updateSelectionState();
+    }
+
+    function toggleSelectAll(checked) {
+      const headerCb = document.getElementById('headerSelectAll');
+      const bulkCb = document.getElementById('bulkSelectAll');
+      if (headerCb) headerCb.checked = checked;
+      if (bulkCb) bulkCb.checked = checked;
+
+      document.querySelectorAll('.item-checkbox').forEach(cb => {
+        cb.checked = checked;
+        const itemCard = cb.closest('.history-item');
+        if (itemCard) itemCard.classList.toggle('selected', checked);
+      });
+      updateSelectionState();
+    }
+
+    function updateSelectionState() {
+      const allBoxes = document.querySelectorAll('.item-checkbox');
+      const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+      const count = checkedBoxes.length;
+
+      const bulkBar = document.getElementById('bulkBar');
+      const selectedCount = document.getElementById('selectedCount');
+      const headerCb = document.getElementById('headerSelectAll');
+      const bulkCb = document.getElementById('bulkSelectAll');
+
+      if (selectedCount) selectedCount.textContent = count;
+
+      if (count > 0) {
+        bulkBar.style.display = 'flex';
+      } else {
+        bulkBar.style.display = 'none';
+      }
+
+      const allChecked = allBoxes.length > 0 && count === allBoxes.length;
+      if (headerCb) headerCb.checked = allChecked;
+      if (bulkCb) bulkCb.checked = allChecked;
+    }
+
+    async function deleteSingleItem(filename) {
+      if (!confirm(`Are you sure you want to delete this audio generation?`)) return;
+      try {
+        const res = await fetch('/api/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filenames: [filename] })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadHistory();
+        } else {
+          alert(`Delete failed: ${data.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        alert(`Delete failed: ${err.message}`);
+      }
+    }
+
+    async function deleteSelected() {
+      const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        alert('Please select at least one audio generation to delete.');
+        return;
+      }
+      const count = checkedBoxes.length;
+      if (!confirm(`Are you sure you want to delete ${count} selected audio generation${count > 1 ? 's' : ''}?`)) return;
+
+      const filenames = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-filename'));
+      try {
+        const res = await fetch('/api/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filenames })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadHistory();
+        } else {
+          alert(`Delete failed: ${data.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        alert(`Delete failed: ${err.message}`);
+      }
+    }
+
+    function downloadSelected() {
+      const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        alert('Please select at least one audio generation to download.');
+        return;
+      }
+      let delay = 0;
+      checkedBoxes.forEach(cb => {
+        const filename = cb.getAttribute('data-filename');
+        const url = cb.getAttribute('data-url');
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, delay);
+        delay += 400;
+      });
+    }
+
+    // Load History
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/history');
+        const history = await res.json();
+        const headerEl = document.getElementById('historySelectHeader');
+        const countEl = document.getElementById('historyItemsCount');
+        const bulkBar = document.getElementById('bulkBar');
+
+        if (!history || history.length === 0) {
+          if (headerEl) headerEl.style.display = 'none';
+          if (bulkBar) bulkBar.style.display = 'none';
+          historyList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No generations yet. Click Generate to create audio.</p>';
+          return;
+        }
+
+        if (headerEl) headerEl.style.display = 'flex';
+        if (countEl) countEl.textContent = `${history.length} item${history.length === 1 ? '' : 's'}`;
+        const headerCb = document.getElementById('headerSelectAll');
+        const bulkCb = document.getElementById('bulkSelectAll');
+        if (headerCb) headerCb.checked = false;
+        if (bulkCb) bulkCb.checked = false;
+        if (bulkBar) bulkBar.style.display = 'none';
+
+        historyList.innerHTML = '';
+        history.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          const qualityText = item.quality || 'High (96k)';
+          const moodText = item.mood || '';
+          const moodBadge = moodText ? `<span class="badge-quality" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.3);">${moodText}</span>` : '';
+          const encodedUrl = encodeURIComponent(item.url);
+          const encodedVoice = encodeURIComponent(item.voiceName);
+          const encodedMood = encodeURIComponent(moodText);
+          const encodedQuality = encodeURIComponent(qualityText);
+          const encodedDownload = encodeURIComponent(item.downloadUrl);
+          const encodedFilename = encodeURIComponent(item.filename);
+
+          div.innerHTML = `
+            <input type="checkbox" class="item-checkbox" data-filename="${item.filename}" data-url="${item.downloadUrl}" onchange="onItemCheckChange(event)">
+            <div class="history-item-body">
+              <div class="history-voice">
+                <div>
+                  <span>${item.voiceName}</span>
+                  ${moodBadge}
+                  <span class="badge-quality">${qualityText}</span>
+                </div>
+                <span style="font-weight: normal; color: var(--text-muted); font-size: 0.75rem;">${item.sizeKb} KB</span>
+              </div>
+              <div class="history-text" title="${item.text}">${item.text}</div>
+              <div class="history-actions">
+                <button class="btn-tiny" onclick="playHistoryItem('${encodedUrl}', '${encodedVoice}', '${encodedMood}', '${encodedQuality}', '${item.sizeKb}', '${encodedDownload}', '${encodedFilename}')">▶ Play</button>
+                <a class="btn-tiny" href="/editor.html?file=${encodedFilename}" target="_blank" title="Open in Audio Studio Editor" style="background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.4); color: #c7d2fe; text-decoration: none;">✂️ Edit</a>
+                <a class="btn-tiny" href="${item.downloadUrl}" download="${item.filename}">📥 Download</a>
+                <button class="btn-tiny btn-danger" onclick="deleteSingleItem('${item.filename}')">🗑 Delete</button>
+              </div>
+            </div>
+          `;
+          historyList.appendChild(div);
+        });
+
+        updateSelectionState();
+      } catch (err) {
+        console.error('Failed to load history:', err);
+      }
+    }
+
+    document.getElementById('refreshHistory').addEventListener('click', loadHistory);
+
+    // Initial load
+    loadVoices();
+    loadHistory();
+  </script>
+</body>
+</html>

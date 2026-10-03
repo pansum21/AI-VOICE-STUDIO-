@@ -1,0 +1,14 @@
+{
+  "name": "free-voice-studio",
+  "version": "1.0.0",
+  "description": "Unlimited 100% Free AI Voice Studio with Neural TTS & Voice Cloning",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "cli": "node cli.js"
+  },
+  "dependencies": {
+    "node-edge-tts": "^1.2.6"
+  }
+}

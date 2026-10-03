@@ -1,0 +1,10 @@
+node_modules/
+generated_audio/
+preview_cache/
+*.log
+*.pcm
+test_long.mp3
+test_madhur_hi.mp3
+.env
+.DS_Store
+Thumbs.db
