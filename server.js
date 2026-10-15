@@ -8,6 +8,13 @@ import { VOICES, FEATURED_VOICES, ELEVENLABS_VOICES, getAllVoices } from './voic
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+process.on('uncaughtException', (err) => {
+  console.error('[Process] Handled uncaught exception:', err?.message || err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[Process] Handled unhandled rejection:', reason?.message || reason);
+});
+
 const PORT = process.env.PORT || 3000;
 const isVercel = !!(process.env.VERCEL || process.env.VERCEL_ENV || process.env.NOW_REGION);
 const OUTPUT_DIR = isVercel ? path.join('/tmp', 'generated_audio') : path.join(__dirname, 'generated_audio');
@@ -501,13 +508,38 @@ async function synthesizeElevenLabs({
 }
 
 export async function handleRequest(req, res) {
-  const host = req.headers.host || 'localhost';
-  const parsedUrl = new URL(req.url, `http://${host}`);
-  const pathname = parsedUrl.pathname;
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  const proto = req.headers['x-forwarded-proto'] || 'http';
+
+  // Reconstruct effective URL from proxy headers, rewrites (__path / __orig_url), or req.url
+  let effectiveUrl = req.url || '/';
+  try {
+    const tempUrl = new URL(effectiveUrl, `${proto}://${host}`);
+    if (tempUrl.searchParams.has('__path')) {
+      effectiveUrl = tempUrl.searchParams.get('__path');
+    } else if (tempUrl.searchParams.has('__orig_url')) {
+      effectiveUrl = tempUrl.searchParams.get('__orig_url');
+    } else if (req.headers['x-forwarded-url']) {
+      effectiveUrl = req.headers['x-forwarded-url'];
+    } else if (req.headers['x-original-url']) {
+      effectiveUrl = req.headers['x-original-url'];
+    }
+  } catch (_) {}
+
+  const parsedUrl = new URL(effectiveUrl, `${proto}://${host}`);
+  let pathname = parsedUrl.pathname || '/';
+
+  // Strip .js extension and trailing slashes for resilient matching
+  if (pathname.endsWith('.js')) {
+    pathname = pathname.slice(0, -3);
+  }
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    pathname = pathname.slice(0, -1);
+  }
 
   // CORS Headers (allow custom ElevenLabs headers)
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-elevenlabs-key, xi-api-key');
 
   if (req.method === 'OPTIONS') {
@@ -517,21 +549,21 @@ export async function handleRequest(req, res) {
   }
 
   // 1. API: List Voices (Returns all ElevenLabs voices + 322 Neural voices)
-  if (pathname === '/api/voices' && req.method === 'GET') {
+  if ((pathname === '/api/voices' || pathname === '/voices') && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(getAllVoices()));
     return;
   }
 
   // 1.2 API: List ElevenLabs Voices Dedicated Endpoint
-  if (pathname === '/api/elevenlabs/voices' && req.method === 'GET') {
+  if ((pathname === '/api/elevenlabs/voices' || pathname === '/elevenlabs/voices') && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(ELEVENLABS_VOICES));
     return;
   }
 
   // 1.4 API: Verify ElevenLabs API Key
-  if (pathname === '/api/elevenlabs/verify-key' && (req.method === 'GET' || req.method === 'POST')) {
+  if ((pathname === '/api/elevenlabs/verify-key' || pathname === '/elevenlabs/verify-key') && (req.method === 'GET' || req.method === 'POST')) {
     let key = req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || parsedUrl.searchParams.get('key') || process.env.ELEVENLABS_API_KEY || '';
 
     const handleVerify = async (apiKey) => {
@@ -574,9 +606,16 @@ export async function handleRequest(req, res) {
     return;
   }
 
-  // 1.5 API: Voice Audio Preview (/api/preview?voiceId=...)
-  if (pathname === '/api/preview' && req.method === 'GET') {
-    const voiceId = parsedUrl.searchParams.get('voiceId');
+  // 1.5 API: Voice Audio Preview (/api/preview?voiceId=... or /preview/...)
+  if ((pathname === '/api/preview' || pathname === '/preview' || pathname.startsWith('/api/preview/') || pathname.startsWith('/preview/')) && req.method === 'GET') {
+    let voiceId = parsedUrl.searchParams.get('voiceId');
+    if (!voiceId) {
+      if (pathname.startsWith('/api/preview/')) {
+        voiceId = decodeURIComponent(pathname.replace('/api/preview/', ''));
+      } else if (pathname.startsWith('/preview/')) {
+        voiceId = decodeURIComponent(pathname.replace('/preview/', ''));
+      }
+    }
     if (!voiceId) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'voiceId parameter is required' }));
@@ -646,7 +685,7 @@ export async function handleRequest(req, res) {
   }
 
   // 1.9 API: Dedicated ElevenLabs Generate Endpoint (/api/elevenlabs/generate)
-  if (pathname === '/api/elevenlabs/generate' && req.method === 'POST') {
+  if ((pathname === '/api/elevenlabs/generate' || pathname === '/elevenlabs/generate') && req.method === 'POST') {
     try {
       const parsed = await parseBody(req);
       const {
@@ -708,10 +747,17 @@ export async function handleRequest(req, res) {
       });
 
       const stats = fs.statSync(filePath);
+      let base64Audio = null;
+      try {
+        const fileBuf = fs.readFileSync(filePath);
+        base64Audio = `data:audio/mp3;base64,${fileBuf.toString('base64')}`;
+      } catch (_) {}
+
       const metadata = {
         filename,
         url: `/audio/${encodeURIComponent(filename)}`,
         downloadUrl: `/download/${encodeURIComponent(filename)}`,
+        audioBase64: base64Audio,
         sizeBytes: stats.size,
         sizeKb: (stats.size / 1024).toFixed(1),
         voiceName: `${elVoice.name} (ElevenLabs)`,
@@ -744,7 +790,7 @@ export async function handleRequest(req, res) {
   }
 
   // 2. API: Generate Audio (Dual Engine: ElevenLabs or Free Neural)
-  if (pathname === '/api/generate' && req.method === 'POST') {
+  if ((pathname === '/api/generate' || pathname === '/generate') && req.method === 'POST') {
     try {
       const parsed = await parseBody(req);
         const {
@@ -812,10 +858,17 @@ export async function handleRequest(req, res) {
           });
 
           const stats = fs.statSync(filePath);
+          let base64Audio = null;
+          try {
+            const fileBuf = fs.readFileSync(filePath);
+            base64Audio = `data:audio/mp3;base64,${fileBuf.toString('base64')}`;
+          } catch (_) {}
+
           const metadata = {
             filename,
             url: `/audio/${encodeURIComponent(filename)}`,
             downloadUrl: `/download/${encodeURIComponent(filename)}`,
+            audioBase64: base64Audio,
             sizeBytes: stats.size,
             sizeKb: (stats.size / 1024).toFixed(1),
             voiceName: `${selectedVoice.name} (ElevenLabs)`,
@@ -956,10 +1009,17 @@ export async function handleRequest(req, res) {
         }
 
         const stats = fs.statSync(filePath);
+        let base64Audio = null;
+        try {
+          const fileBuf = fs.readFileSync(filePath);
+          base64Audio = `data:audio/${fileExt === 'webm' ? 'webm' : 'mp3'};base64,${fileBuf.toString('base64')}`;
+        } catch (_) {}
+
         const metadata = {
           filename,
           url: `/audio/${encodeURIComponent(filename)}`,
           downloadUrl: `/download/${encodeURIComponent(filename)}`,
+          audioBase64: base64Audio,
           sizeBytes: stats.size,
           sizeKb: (stats.size / 1024).toFixed(1),
           voiceName: selectedVoice.name,
@@ -993,7 +1053,7 @@ export async function handleRequest(req, res) {
     }
 
   // 2.5 API: Delete Audio Files (Single or Batch)
-  if (pathname === '/api/delete' && req.method === 'POST') {
+  if ((pathname === '/api/delete' || pathname === '/delete') && (req.method === 'POST' || req.method === 'DELETE')) {
     try {
       const parsed = await parseBody(req);
       const { filenames = [] } = parsed;
@@ -1035,7 +1095,7 @@ export async function handleRequest(req, res) {
   }
 
   // 2.8 API: Save Edited Audio
-  if (pathname === '/api/save-edited' && req.method === 'POST') {
+  if ((pathname === '/api/save-edited' || pathname === '/save-edited') && req.method === 'POST') {
     try {
       const parsed = await parseBody(req);
       const { originalFilename, audioBase64, format = 'wav', editLabel = 'Edited', text = '', voiceName = 'Studio Voice' } = parsed;
@@ -1061,6 +1121,7 @@ export async function handleRequest(req, res) {
         filename,
         url: `/audio/${encodeURIComponent(filename)}`,
         downloadUrl: `/download/${encodeURIComponent(filename)}`,
+        audioBase64: `data:audio/${safeFormat};base64,${audioBase64}`,
         sizeBytes: stats.size,
         sizeKb: (stats.size / 1024).toFixed(1),
         voiceName: `${voiceName} (Edited)`,
@@ -1091,7 +1152,7 @@ export async function handleRequest(req, res) {
   }
 
   // 3. API: History
-  if (pathname === '/api/history' && req.method === 'GET') {
+  if ((pathname === '/api/history' || pathname === '/history') && req.method === 'GET') {
     const historyFile = path.join(OUTPUT_DIR, 'history.json');
     if (fs.existsSync(historyFile)) {
       const data = fs.readFileSync(historyFile, 'utf-8');
@@ -1105,19 +1166,31 @@ export async function handleRequest(req, res) {
   }
 
   // 4. Stream Audio (With HTTP Range 206 Partial Content support)
-  if (pathname.startsWith('/audio/') && req.method === 'GET') {
-    const filename = decodeURIComponent(pathname.replace('/audio/', ''));
-    const safePath = path.join(OUTPUT_DIR, path.basename(filename));
+  if ((pathname.startsWith('/audio/') || pathname.startsWith('/api/audio/')) && req.method === 'GET') {
+    const rawFile = pathname.startsWith('/audio/') ? pathname.replace('/audio/', '') : pathname.replace('/api/audio/', '');
+    const filename = decodeURIComponent(rawFile);
+    const candidatePaths = [
+      path.join(OUTPUT_DIR, path.basename(filename)),
+      path.join('/tmp', 'generated_audio', path.basename(filename)),
+      path.join(__dirname, 'generated_audio', path.basename(filename))
+    ];
+    const safePath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[0];
     streamAudioWithRange(safePath, req, res);
     return;
   }
 
   // 5. Download Audio
-  if (pathname.startsWith('/download/') && req.method === 'GET') {
-    const filename = decodeURIComponent(pathname.replace('/download/', ''));
-    const safePath = path.join(OUTPUT_DIR, path.basename(filename));
+  if ((pathname.startsWith('/download/') || pathname.startsWith('/api/download/')) && req.method === 'GET') {
+    const rawFile = pathname.startsWith('/download/') ? pathname.replace('/download/', '') : pathname.replace('/api/download/', '');
+    const filename = decodeURIComponent(rawFile);
+    const candidatePaths = [
+      path.join(OUTPUT_DIR, path.basename(filename)),
+      path.join('/tmp', 'generated_audio', path.basename(filename)),
+      path.join(__dirname, 'generated_audio', path.basename(filename))
+    ];
+    const safePath = candidatePaths.find(p => fs.existsSync(p));
 
-    if (fs.existsSync(safePath)) {
+    if (safePath && fs.existsSync(safePath)) {
       const stat = fs.statSync(safePath);
       const ext = path.extname(safePath).toLowerCase();
       const mimeTypes = {
@@ -1214,9 +1287,7 @@ export async function handleRequest(req, res) {
 
 export default handleRequest;
 
-const isDirectRun = !isVercel && process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
-
-if (isDirectRun) {
+if (!isVercel) {
   const server = http.createServer((req, res) => {
     handleRequest(req, res).catch(err => {
       console.error('Unhandled request error:', err);

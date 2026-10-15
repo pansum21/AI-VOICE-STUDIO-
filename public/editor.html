@@ -929,6 +929,18 @@
       const urlParams = new URLSearchParams(window.location.search);
       const filename = urlParams.get('file');
 
+      // Check if audio was passed directly from studio via sessionStorage
+      try {
+        const sessionData = sessionStorage.getItem('studio_current_audio');
+        if (sessionData) {
+          const parsed = JSON.parse(sessionData);
+          if (parsed && parsed.audioBase64 && (!filename || parsed.filename === filename)) {
+            loadAudioFromBase64(parsed.audioBase64, parsed.filename || filename || 'studio_audio.mp3');
+            return;
+          }
+        }
+      } catch (_) {}
+
       let audioUrl = '';
       let displayName = '';
 
@@ -950,6 +962,36 @@
         loadAudioSource(audioUrl, displayName);
       } else {
         trackFilename.textContent = 'No audio loaded. Click "Open File" to upload audio.';
+      }
+    }
+
+    async function loadAudioFromBase64(dataUri, name) {
+      initAudioContext();
+      trackFilename.textContent = `Loading ${name}...`;
+      try {
+        const response = await fetch(dataUri);
+        const arrayBuffer = await response.arrayBuffer();
+        audioCtx.decodeAudioData(arrayBuffer, (decoded) => {
+          originalBuffer = decoded;
+          currentBuffer = decoded;
+          undoStack = [];
+          redoStack = [];
+          updateUndoRedoButtons();
+          trackFilename.textContent = name;
+          trackDuration.textContent = formatTime(decoded.duration);
+          trackFormat.textContent = `${decoded.sampleRate}Hz / ${decoded.numberOfChannels === 1 ? 'Mono' : 'Stereo'}`;
+          seekToStart();
+          drawWaveform();
+          updateSilencePreview();
+          showToast(`✅ Loaded "${name}" (${decoded.duration.toFixed(1)}s)`);
+        }, (err) => {
+          console.error('Audio decode error:', err);
+          trackFilename.textContent = 'Failed to decode audio format.';
+          showToast('⚠️ Could not decode audio file.');
+        });
+      } catch (err) {
+        console.error('Fetch base64 audio error:', err);
+        trackFilename.textContent = err.message || 'Error loading audio.';
       }
     }
 

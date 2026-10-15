@@ -562,9 +562,14 @@ let cachedAllVoices = null;
 export function getAllVoices() {
   if (cachedAllVoices) return cachedAllVoices;
 
-  const catalogFile = path.join(__dirname, 'all_voices.json');
+  const candidateFiles = [
+    path.join(__dirname, 'all_voices.json'),
+    path.join(process.cwd(), 'all_voices.json'),
+    path.join(__dirname, '..', 'all_voices.json')
+  ];
+  const catalogFile = candidateFiles.find(p => fs.existsSync(p));
   let raw = [];
-  if (fs.existsSync(catalogFile)) {
+  if (catalogFile) {
     try {
       raw = JSON.parse(fs.readFileSync(catalogFile, 'utf-8'));
     } catch (err) {

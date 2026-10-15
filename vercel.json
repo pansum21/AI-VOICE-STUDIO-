@@ -2,13 +2,22 @@
   "version": 2,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/audio/(.*)", "destination": "/api/index.js" },
-    { "source": "/download/(.*)", "destination": "/api/index.js" },
+    { "source": "/api/voices", "destination": "/api/voices.js" },
+    { "source": "/api/generate", "destination": "/api/generate.js" },
+    { "source": "/api/elevenlabs/voices", "destination": "/api/elevenlabs/voices.js" },
+    { "source": "/api/elevenlabs/generate", "destination": "/api/elevenlabs/generate.js" },
+    { "source": "/api/elevenlabs/verify-key", "destination": "/api/elevenlabs/verify-key.js" },
+    { "source": "/api/preview/(.*)", "destination": "/api/preview.js?voiceId=$1" },
+    { "source": "/api/preview", "destination": "/api/preview.js" },
+    { "source": "/api/history", "destination": "/api/history.js" },
+    { "source": "/api/delete", "destination": "/api/delete.js" },
+    { "source": "/api/save-edited", "destination": "/api/save-edited.js" },
+    { "source": "/audio/(.*)", "destination": "/api/audio.js?file=$1" },
+    { "source": "/download/(.*)", "destination": "/api/download.js?file=$1" },
     { "source": "/editor", "destination": "/editor.html" }
   ],
   "functions": {
-    "api/index.js": {
+    "api/**/*.js": {
       "includeFiles": "all_voices.json,voices.js,public/**,*.html",
       "maxDuration": 60
     }

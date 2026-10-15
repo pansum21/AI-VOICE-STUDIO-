@@ -1262,12 +1262,253 @@
   </div>
 
   <script>
+    // Embedded high-fidelity voices for instant UI availability
+    const DEFAULT_EMBEDDED_VOICES = [
+      {
+        id: 'pNInz6obpgDQGcFmaJgB',
+        voiceId: 'pNInz6obpgDQGcFmaJgB',
+        name: 'Adam',
+        gender: 'Male',
+        lang: 'English / Multilingual (29 Languages)',
+        locale: 'en-US',
+        localeName: 'Multilingual (English, Hindi, etc.)',
+        engine: 'elevenlabs',
+        tag: 'Dominant, Firm / Deep American Narration',
+        description: 'The iconic deep American baritone. ElevenLabs flagship voice for audiobooks, documentaries, and cinematic narration.',
+        previewUrl: 'https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/d6905d7a-dd26-4187-bfff-1bd3a5ea7cac.mp3',
+        isFeatured: true
+      },
+      {
+        id: 'onwK4e9ZLuTAKqWW03F9',
+        voiceId: 'onwK4e9ZLuTAKqWW03F9',
+        name: 'Daniel',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-GB',
+        localeName: 'British / Multilingual',
+        engine: 'elevenlabs',
+        tag: 'Authoritative Broadcaster / News & Narration',
+        description: 'Deep, steady, authoritative British broadcaster voice with formal cadence and prestige.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/onwK4e9ZLuTAKqWW03F9/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiI3ZWVlMDIzNi0xYTcyLTRiODYtYjMwMy01ZGNhZGMwMDdiYTkubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'nPczCjzI2devNBz1zQrb',
+        voiceId: 'nPczCjzI2devNBz1zQrb',
+        name: 'Brian',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Multilingual',
+        engine: 'elevenlabs',
+        tag: 'Deep, Resonant & Comforting Storyteller',
+        description: 'Rich, comforting narrative baritone with natural breath and authentic pacing. Masterful for dramatic fiction.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/nPczCjzI2devNBz1zQrb/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiIyZGQzZTcyYy00ZmQzLTQyZjEtOTNlYS1hYmM1ZDRlNWFhMWQubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'JBFqnCBsd6RMkjVDRZzb',
+        voiceId: 'JBFqnCBsd6RMkjVDRZzb',
+        name: 'George',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-GB',
+        localeName: 'British / Warm Storyteller',
+        engine: 'elevenlabs',
+        tag: 'Warm, British & Expressive Narration',
+        description: 'Warm, cultured British narrator with subtle gravitas, ideal for classical storytelling and historical documentaries.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/JBFqnCBsd6RMkjVDRZzb/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiJjYTYwMjBmZC02NDMwLTQwY2YtYmExMi00NTM4ZDJmYWY5MjMubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: '21m00Tcm4TlvDq8ikWAM',
+        voiceId: '21m00Tcm4TlvDq8ikWAM',
+        name: 'Rachel',
+        gender: 'Female',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Calm & Professional',
+        engine: 'elevenlabs',
+        tag: 'Calm, Soothing & Crystal Clear',
+        description: 'Calm, gentle, crystal-clear American female narrator. ElevenLabs signature voice for guided audio, commercials, and corporate stories.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/21m00Tcm4TlvDq8ikWAM/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiJmNDQ3Mjg2NC01MTlkLTQ2NjctOGNmYy1jMTU3OTQ1NTZhNWQubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'ErXwobaYiN019PkySvjV',
+        voiceId: 'ErXwobaYiN019PkySvjV',
+        name: 'Antoni',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Energetic & Bold',
+        engine: 'elevenlabs',
+        tag: 'Energetic, Friendly & Dynamic',
+        description: 'Dynamic, confident American male voice with crisp articulation and punchy rhythm.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/ErXwobaYiN019PkySvjV/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiJmOTFhOGY1ZS1jY2YyLTQ0Y2QtYmY0ZS1mMmNjZGRmYjY3NTgubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'TxGEqnHWrfWFTfGW9XjX',
+        voiceId: 'TxGEqnHWrfWFTfGW9XjX',
+        name: 'Josh',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'Young American / Natural Casual',
+        engine: 'elevenlabs',
+        tag: 'Deep, Chill & Natural Conversation',
+        description: 'Relaxed, authentic, conversational young American narrator. Perfect for podcasts, casual narration, and YouTube.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/TxGEqnHWrfWFTfGW9XjX/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiI1YjIxMDExZi1mODIyLTQwNTItODk2NC02MTVkZjhhNmRkNTgubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'VR6AewLTigWG4xSOukaG',
+        voiceId: 'VR6AewLTigWG4xSOukaG',
+        name: 'Arnold',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Crisp & Authoritative',
+        engine: 'elevenlabs',
+        tag: 'Crisp, Dramatic & Powerful',
+        description: 'Strong, impactful tone with authoritative depth. Outstanding for cinematic trailers and high-energy narration.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/VR6AewLTigWG4xSOukaG/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiIyN2U0OGNlOC04ODAzLTQ3NGMtOGI4NS1lZDJjNmJjM2EyMDYubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'yoZ06aMxZJJ28mfd3POQ',
+        voiceId: 'yoZ06aMxZJJ28mfd3POQ',
+        name: 'Sam',
+        gender: 'Male',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Direct & Engaging',
+        engine: 'elevenlabs',
+        tag: 'Raspy, Dynamic & Authentic',
+        description: 'Authentic rasp with energetic pace and direct connection. Superb for games, YouTube, and character dialogue.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/yoZ06aMxZJJ28mfd3POQ/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiI1M2E4MzMwMC02M2I2LTRhMWUtOTY5YS1hY2VjYjI2YWM4YmQubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      {
+        id: 'EXAVITQu4vr4xnSDxMaL',
+        voiceId: 'EXAVITQu4vr4xnSDxMaL',
+        name: 'Bella',
+        gender: 'Female',
+        lang: 'English / Multilingual',
+        locale: 'en-US',
+        localeName: 'American / Soft & Expressive',
+        engine: 'elevenlabs',
+        tag: 'Warm, Expressive & Engaging',
+        description: 'Bright, emotional, and expressive American narrator. Perfect for fiction, poetry, and character roles.',
+        previewUrl: 'https://api.us.elevenlabs.io/v1/voices/EXAVITQu4vr4xnSDxMaL/previews/audio?payload=eyJ2b2ljZV9zb3VyY2UiOiJwcmVtYWRlIiwiZmlsZW5hbWUiOiI5MWQ1NTE0Yi1lNDFlLTRjN2YtOTQ4Ni0wMTg3Yzc3Y2Q4YzQubXAzIiwidGltZXN0YW1wIjoxNzkyMDkwODAwMDAwMDAwfQ%3D%3D',
+        isFeatured: true
+      },
+      // Featured Free Neural Voices
+      {
+        id: 'en-US-AriaNeural',
+        name: 'Aria',
+        fullName: 'Microsoft Aria Online (Natural)',
+        gender: 'Female',
+        locale: 'en-US',
+        localeName: 'English (US)',
+        engine: 'free',
+        tag: 'Flagship Female / Story & Expressive',
+        description: 'Warm, expressive, high-clarity American female narrator with natural breathing and emotional pacing.',
+        isFeatured: true
+      },
+      {
+        id: 'en-US-GuyNeural',
+        name: 'Guy',
+        fullName: 'Microsoft Guy Online (Natural)',
+        gender: 'Male',
+        locale: 'en-US',
+        localeName: 'English (US)',
+        engine: 'free',
+        tag: 'Flagship Male / Deep American Baritone',
+        description: 'Deep, authoritative American baritone with natural human timbre. Superb for audiobooks, mystery, and documentaries.',
+        isFeatured: true
+      },
+      {
+        id: 'en-US-ChristopherNeural',
+        name: 'Christopher',
+        fullName: 'Microsoft Christopher Online (Natural)',
+        gender: 'Male',
+        locale: 'en-US',
+        localeName: 'English (US)',
+        engine: 'free',
+        tag: 'Cinematic Thriller / Deep Mystery',
+        description: 'Warm, commanding, deep cinematic narrator with subtle dramatic cadence.',
+        isFeatured: true
+      },
+      {
+        id: 'en-US-JennyNeural',
+        name: 'Jenny',
+        fullName: 'Microsoft Jenny Online (Natural)',
+        gender: 'Female',
+        locale: 'en-US',
+        localeName: 'English (US)',
+        engine: 'free',
+        tag: 'Friendly / Assistant / Professional',
+        description: 'Bright, warm, and highly intelligible female narrator for guides, apps, and explainers.',
+        isFeatured: true
+      },
+      {
+        id: 'en-IN-PrabhatNeural',
+        name: 'Prabhat',
+        fullName: 'Microsoft Prabhat Online (Natural)',
+        gender: 'Male',
+        locale: 'en-IN',
+        localeName: 'English (India) / Bilingual',
+        engine: 'free',
+        tag: 'Indian English / Clear Professional',
+        description: 'Resonant, polished Indian-accented English and bilingual narration with exceptional warmth.',
+        isFeatured: true
+      },
+      {
+        id: 'hi-IN-MadhurNeural',
+        name: 'Madhur',
+        fullName: 'Microsoft Madhur Online (Natural)',
+        gender: 'Male',
+        locale: 'hi-IN',
+        localeName: 'Hindi (India)',
+        engine: 'free',
+        tag: 'Pure Hindi / Deep Storytelling',
+        description: 'Rich, deep, authentic Hindi storyteller male voice with flawless Hindi diction and dramatic warmth.',
+        isFeatured: true
+      },
+      {
+        id: 'hi-IN-SwaraNeural',
+        name: 'Swara',
+        fullName: 'Microsoft Swara Online (Natural)',
+        gender: 'Female',
+        locale: 'hi-IN',
+        localeName: 'Hindi (India)',
+        engine: 'free',
+        tag: 'Pure Hindi / Expressive Female',
+        description: 'Melodious, expressive female Hindi narrator for stories, poetry, explainers, and audiobooks.',
+        isFeatured: true
+      },
+      {
+        id: 'en-GB-RyanNeural',
+        name: 'Ryan',
+        fullName: 'Microsoft Ryan Online (Natural)',
+        gender: 'Male',
+        locale: 'en-GB',
+        localeName: 'English (UK)',
+        engine: 'free',
+        tag: 'British Authoritative / Broadcaster',
+        description: 'Prestige British accent with formal cadence and authoritative broadcast presence.',
+        isFeatured: true
+      }
+    ];
+
     // State
     let currentEngine = localStorage.getItem('last_engine_mode') || 'elevenlabs';
     let currentVoiceTab = 'main';
-    let allVoices = [];
-    let elevenlabsVoices = [];
-    let freeVoices = [];
+    let allVoices = [...DEFAULT_EMBEDDED_VOICES];
+    let elevenlabsVoices = allVoices.filter(v => v.engine === 'elevenlabs');
+    let freeVoices = allVoices.filter(v => v.engine !== 'elevenlabs');
     let selectedVoiceId = localStorage.getItem('last_selected_voice') || 'pNInz6obpgDQGcFmaJgB'; // Adam by default
     let starredVoiceIds = new Set(JSON.parse(localStorage.getItem('my_featured_voices') || '[]'));
     let currentPreviewAudio = null;
@@ -1731,7 +1972,7 @@
 
     // Voice Preview Playback
     function togglePreview(e, voiceId) {
-      e.stopPropagation();
+      if (e) e.stopPropagation();
 
       if (currentPlayingVoiceId === voiceId && currentPreviewAudio) {
         currentPreviewAudio.pause();
@@ -1744,12 +1985,18 @@
       if (currentPreviewAudio) {
         currentPreviewAudio.pause();
         currentPreviewAudio = null;
+        currentPlayingVoiceId = null;
       }
 
       currentPlayingVoiceId = voiceId;
       updatePreviewButtons();
 
-      const audio = new Audio(`/api/preview?voiceId=${encodeURIComponent(voiceId)}`);
+      const selectedVoice = allVoices.find(v => v.id === voiceId);
+      const previewSrc = (selectedVoice && selectedVoice.previewUrl)
+        ? selectedVoice.previewUrl
+        : `/api/preview?voiceId=${encodeURIComponent(voiceId)}`;
+
+      const audio = new Audio(previewSrc);
       currentPreviewAudio = audio;
 
       audio.onplay = () => updatePreviewButtons();
@@ -1760,13 +2007,24 @@
       };
       audio.onerror = () => {
         console.error('Failed to play preview for voice:', voiceId);
+        // Fallback to /api/preview if direct URL had CORS issue
+        if (selectedVoice && selectedVoice.previewUrl && previewSrc === selectedVoice.previewUrl) {
+          const fallbackAudio = new Audio(`/api/preview?voiceId=${encodeURIComponent(voiceId)}`);
+          currentPreviewAudio = fallbackAudio;
+          fallbackAudio.play().catch(() => {
+            currentPlayingVoiceId = null;
+            currentPreviewAudio = null;
+            updatePreviewButtons();
+          });
+          return;
+        }
         currentPlayingVoiceId = null;
         currentPreviewAudio = null;
         updatePreviewButtons();
       };
 
       audio.play().catch(err => {
-        console.error('Play error:', err);
+        console.warn('Play preview error:', err);
         currentPlayingVoiceId = null;
         currentPreviewAudio = null;
         updatePreviewButtons();
@@ -1796,22 +2054,31 @@
     async function loadVoices() {
       try {
         const res = await fetch('/api/voices');
-        allVoices = await res.json();
-
-        elevenlabsVoices = allVoices.filter(v => v.engine === 'elevenlabs');
-        freeVoices = allVoices.filter(v => v.engine !== 'elevenlabs');
-
-        totalVoiceCount.textContent = `${elevenlabsVoices.length} ElevenLabs + ${freeVoices.length} Free`;
-
-        if (!allVoices.some(v => v.id === selectedVoiceId)) {
-          selectedVoiceId = currentEngine === 'elevenlabs' ? elevenlabsVoices[0]?.id : freeVoices[0]?.id;
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            allVoices = data;
+          }
         }
-
-        updateFeaturedCount();
-        switchEngine(currentEngine);
       } catch (err) {
-        console.error('Failed to load voices:', err);
+        console.warn('Could not load extra voices from server, using embedded catalog:', err.message);
       }
+
+      if (!Array.isArray(allVoices) || allVoices.length === 0) {
+        allVoices = [...DEFAULT_EMBEDDED_VOICES];
+      }
+
+      elevenlabsVoices = allVoices.filter(v => v.engine === 'elevenlabs');
+      freeVoices = allVoices.filter(v => v.engine !== 'elevenlabs');
+
+      totalVoiceCount.textContent = `${elevenlabsVoices.length} ElevenLabs + ${freeVoices.length} Free`;
+
+      if (!allVoices.some(v => v.id === selectedVoiceId)) {
+        selectedVoiceId = currentEngine === 'elevenlabs' ? elevenlabsVoices[0]?.id : freeVoices[0]?.id;
+      }
+
+      updateFeaturedCount();
+      switchEngine(currentEngine);
     }
 
     // Generate Audio
@@ -1891,13 +2158,21 @@
 
         const audio = data.audio;
         playerSection.style.display = 'block';
-        audioPlayer.src = audio.url;
-        audioPlayer.play().catch(() => {});
+        const audioSrc = audio.audioBase64 || audio.url;
+        audioPlayer.src = audioSrc;
+        audioPlayer.play().catch(e => console.warn('Autoplay prevented:', e));
         playerInfo.innerHTML = `<strong>${audio.voiceName}</strong> <span class="badge-quality">${audio.mood || 'Natural'}</span> <span class="badge-quality">${audio.quality || 'MP3'}</span> (${audio.sizeKb} KB)`;
-        downloadBtn.href = audio.downloadUrl;
+        downloadBtn.href = audioSrc;
         downloadBtn.download = audio.filename;
         if (editAudioBtn) {
           editAudioBtn.href = `/editor.html?file=${encodeURIComponent(audio.filename)}`;
+          try {
+            sessionStorage.setItem('studio_current_audio', JSON.stringify({
+              filename: audio.filename,
+              audioBase64: audio.audioBase64,
+              voiceName: audio.voiceName
+            }));
+          } catch (_) {}
         }
 
         loadHistory();
