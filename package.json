@@ -9,6 +9,6 @@
     "cli": "node cli.js"
   },
   "dependencies": {
-    "node-edge-tts": "^1.2.6"
+    "node-edge-tts": "^1.2.11"
   }
 }

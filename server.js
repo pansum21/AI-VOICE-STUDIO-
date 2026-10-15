@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { EdgeTTS } from 'node-edge-tts';
-import { VOICES, FEATURED_VOICES, getAllVoices } from './voices.js';
+import { VOICES, FEATURED_VOICES, ELEVENLABS_VOICES, getAllVoices } from './voices.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -408,14 +408,79 @@ function getPreviewText(voice) {
   return `Hi! I am ${voice.name}, and this is a preview of my voice.`;
 }
 
+// Synthesize speech using authentic ElevenLabs official API with true emotional inflections
+async function synthesizeElevenLabs({
+  text,
+  voiceId,
+  modelId = 'eleven_multilingual_v2',
+  stability = 0.40,
+  similarityBoost = 0.85,
+  style = 0.35,
+  speakerBoost = true,
+  apiKey,
+  outputPath
+}) {
+  if (!apiKey || !apiKey.trim()) {
+    throw new Error('ElevenLabs API key is required. Please provide your key or switch to the Free Engine.');
+  }
+
+  // ElevenLabs handles ~4000-5000 characters per single request reliably. Split if larger.
+  const chunks = splitTextIntoChunks(text, 4000);
+  const chunkBuffers = [];
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunkText = chunks[i];
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=mp3_44100_128`;
+
+    const payload = {
+      text: chunkText,
+      model_id: modelId || 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: Math.min(1.0, Math.max(0.0, parseFloat(stability) ?? 0.40)),
+        similarity_boost: Math.min(1.0, Math.max(0.0, parseFloat(similarityBoost) ?? 0.85)),
+        style: Math.min(1.0, Math.max(0.0, parseFloat(style) ?? 0.35)),
+        use_speaker_boost: speakerBoost !== false
+      }
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey.trim(),
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = errJson.detail?.message || errJson.message || JSON.stringify(errJson);
+      } catch (_) {
+        errDetail = await response.text();
+      }
+      throw new Error(`ElevenLabs Error (${response.status}): ${errDetail || response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    chunkBuffers.push(Buffer.from(arrayBuffer));
+  }
+
+  const finalBuffer = Buffer.concat(chunkBuffers);
+  fs.writeFileSync(outputPath, finalBuffer);
+  return finalBuffer.length;
+}
+
 const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = parsedUrl.pathname;
 
-  // CORS Headers
+  // CORS Headers (allow custom ElevenLabs headers)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-elevenlabs-key, xi-api-key');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -423,10 +488,67 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 1. API: List Voices (Returns all 322 voices + featured flags)
+  // 1. API: List Voices (Returns all ElevenLabs voices + 322 Neural voices)
   if (pathname === '/api/voices' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(getAllVoices()));
+    return;
+  }
+
+  // 1.2 API: List ElevenLabs Voices Dedicated Endpoint
+  if (pathname === '/api/elevenlabs/voices' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(ELEVENLABS_VOICES));
+    return;
+  }
+
+  // 1.4 API: Verify ElevenLabs API Key
+  if (pathname === '/api/elevenlabs/verify-key' && (req.method === 'GET' || req.method === 'POST')) {
+    let key = req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || parsedUrl.searchParams.get('key') || process.env.ELEVENLABS_API_KEY || '';
+
+    const handleVerify = async (apiKey) => {
+      if (!apiKey || !apiKey.trim()) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ valid: false, error: 'API key is required.' }));
+        return;
+      }
+      try {
+        const resp = await fetch('https://api.elevenlabs.io/v1/user/subscription', {
+          headers: { 'xi-api-key': apiKey.trim() }
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            valid: true,
+            tier: data.tier || 'free',
+            characterCount: data.character_count || 0,
+            characterLimit: data.character_limit || 10000,
+            canExtendCharacterLimit: data.can_extend_character_limit || false
+          }));
+        } else {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ valid: false, error: 'Invalid ElevenLabs API key. Please verify your key on elevenlabs.io' }));
+        }
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ valid: false, error: e.message }));
+      }
+    };
+
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const parsed = JSON.parse(body || '{}');
+          key = parsed.apiKey || key;
+        } catch (_) {}
+        handleVerify(key);
+      });
+    } else {
+      handleVerify(key);
+    }
     return;
   }
 
@@ -440,6 +562,33 @@ const server = http.createServer(async (req, res) => {
     }
 
     const safeVoiceId = sanitize(voiceId);
+
+    // Check if this is an authentic ElevenLabs voice
+    const elVoice = ELEVENLABS_VOICES.find(v => v.id === voiceId || v.voiceId === voiceId);
+    if (elVoice) {
+      const previewFile = path.join(PREVIEW_DIR, `el_${safeVoiceId}.mp3`);
+      if (fs.existsSync(previewFile) && fs.statSync(previewFile).size > 0) {
+        streamAudioWithRange(previewFile, req, res, 'audio/mpeg');
+        return;
+      }
+
+      // Fetch authentic ElevenLabs voice sample and cache locally
+      if (elVoice.previewUrl) {
+        try {
+          const resp = await fetch(elVoice.previewUrl);
+          if (resp.ok) {
+            const buf = Buffer.from(await resp.arrayBuffer());
+            fs.writeFileSync(previewFile, buf);
+            streamAudioWithRange(previewFile, req, res, 'audio/mpeg');
+            return;
+          }
+        } catch (e) {
+          console.error('Error fetching ElevenLabs preview audio:', e.message);
+        }
+      }
+    }
+
+    // Default EdgeTTS preview
     const previewFile = path.join(PREVIEW_DIR, `${safeVoiceId}.mp3`);
 
     // If cached, stream directly with range support
@@ -474,13 +623,129 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 2. API: Generate Audio
+  // 1.9 API: Dedicated ElevenLabs Generate Endpoint (/api/elevenlabs/generate)
+  if (pathname === '/api/elevenlabs/generate' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const parsed = JSON.parse(body || '{}');
+        const {
+          text,
+          voiceId = 'pNInz6obpgDQGcFmaJgB', // Adam by default
+          modelId = 'eleven_multilingual_v2',
+          stability = 0.40,
+          similarityBoost = 0.85,
+          style = 0.35,
+          speakerBoost = true
+        } = parsed;
+
+        const apiKey = parsed.apiKey || req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || process.env.ELEVENLABS_API_KEY;
+
+        if (!apiKey) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: false,
+            needsApiKey: true,
+            error: 'ElevenLabs API Key required. Please enter your API key to generate using authentic ElevenLabs voice models, or switch to the Free Engine.'
+          }));
+          return;
+        }
+
+        if (!text || !text.trim()) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Text prompt is required.' }));
+          return;
+        }
+
+        const cleanedText = cleanScript(text);
+        if (!cleanedText) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Script is empty after cleaning.' }));
+          return;
+        }
+
+        const elVoice = ELEVENLABS_VOICES.find(v => v.id === voiceId || v.voiceId === voiceId) || {
+          id: voiceId,
+          name: 'ElevenLabs Voice',
+          gender: 'Neutral'
+        };
+
+        const timestamp = Date.now();
+        const snippet = sanitize(cleanedText.replace(/\s+/g, '_'));
+        const filename = `${timestamp}_ElevenLabs_${elVoice.name.replace(/[^a-zA-Z0-9]/g, '_')}_${snippet}.mp3`;
+        const filePath = path.join(OUTPUT_DIR, filename);
+
+        await synthesizeElevenLabs({
+          text: cleanedText,
+          voiceId: elVoice.id,
+          modelId,
+          stability,
+          similarityBoost,
+          style,
+          speakerBoost,
+          apiKey,
+          outputPath: filePath
+        });
+
+        const stats = fs.statSync(filePath);
+        const metadata = {
+          filename,
+          url: `/audio/${encodeURIComponent(filename)}`,
+          downloadUrl: `/download/${encodeURIComponent(filename)}`,
+          sizeBytes: stats.size,
+          sizeKb: (stats.size / 1024).toFixed(1),
+          voiceName: `${elVoice.name} (ElevenLabs)`,
+          voiceId: elVoice.id,
+          engine: 'elevenlabs',
+          quality: 'Studio MP3 (44.1kHz)',
+          mood: `ElevenLabs ${modelId.includes('multilingual') ? 'Multilingual v2' : 'Turbo v2.5'} (Emotion/Style: ${Math.round(style * 100)}%, Stab: ${Math.round(stability * 100)}%)`,
+          text: cleanedText,
+          createdAt: new Date().toISOString()
+        };
+
+        const historyFile = path.join(OUTPUT_DIR, 'history.json');
+        let history = [];
+        if (fs.existsSync(historyFile)) {
+          try {
+            history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
+          } catch (_) {}
+        }
+        history.unshift(metadata);
+        fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, audio: metadata }));
+      } catch (err) {
+        console.error('ElevenLabs generation error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2. API: Generate Audio (Dual Engine: ElevenLabs or Free Neural)
   if (pathname === '/api/generate' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const { text, voiceId, rate = 'default', pitch = 'default', quality = 'high', mood = 'normal' } = JSON.parse(body || '{}');
+        const parsed = JSON.parse(body || '{}');
+        const {
+          text,
+          voiceId,
+          rate = 'default',
+          pitch = 'default',
+          quality = 'high',
+          mood = 'normal',
+          modelId = 'eleven_multilingual_v2',
+          stability = 0.40,
+          similarityBoost = 0.85,
+          style = 0.35,
+          speakerBoost = true,
+          engine
+        } = parsed;
 
         if (!text || !text.trim()) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -497,6 +762,72 @@ const server = http.createServer(async (req, res) => {
 
         const allVoices = getAllVoices();
         const selectedVoice = allVoices.find(v => v.id.toLowerCase() === (voiceId || '').toLowerCase()) || allVoices[0];
+
+        // Route to ElevenLabs if requested or if selected voice is an ElevenLabs model
+        const isElevenLabs = engine === 'elevenlabs' || selectedVoice.engine === 'elevenlabs' || ELEVENLABS_VOICES.some(v => v.id === voiceId);
+
+        if (isElevenLabs) {
+          const apiKey = parsed.apiKey || req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || process.env.ELEVENLABS_API_KEY;
+
+          if (!apiKey) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              success: false,
+              needsApiKey: true,
+              error: `ElevenLabs API Key required to generate authentic ${selectedVoice.name} voice. Please enter your API key in the studio or switch to the Free Engine.`
+            }));
+            return;
+          }
+
+          const timestamp = Date.now();
+          const snippet = sanitize(cleanedText.replace(/\s+/g, '_'));
+          const filename = `${timestamp}_ElevenLabs_${selectedVoice.name.replace(/[^a-zA-Z0-9]/g, '_')}_${snippet}.mp3`;
+          const filePath = path.join(OUTPUT_DIR, filename);
+
+          await synthesizeElevenLabs({
+            text: cleanedText,
+            voiceId: selectedVoice.id,
+            modelId,
+            stability,
+            similarityBoost,
+            style,
+            speakerBoost,
+            apiKey,
+            outputPath: filePath
+          });
+
+          const stats = fs.statSync(filePath);
+          const metadata = {
+            filename,
+            url: `/audio/${encodeURIComponent(filename)}`,
+            downloadUrl: `/download/${encodeURIComponent(filename)}`,
+            sizeBytes: stats.size,
+            sizeKb: (stats.size / 1024).toFixed(1),
+            voiceName: `${selectedVoice.name} (ElevenLabs)`,
+            voiceId: selectedVoice.id,
+            engine: 'elevenlabs',
+            quality: 'Studio MP3 (44.1kHz)',
+            mood: `ElevenLabs ${modelId.includes('multilingual') ? 'Multilingual v2' : 'Turbo v2.5'} (Emotion: ${Math.round(style * 100)}%)`,
+            text: cleanedText,
+            createdAt: new Date().toISOString()
+          };
+
+          const historyFile = path.join(OUTPUT_DIR, 'history.json');
+          let history = [];
+          if (fs.existsSync(historyFile)) {
+            try {
+              history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
+            } catch (_) {}
+          }
+          history.unshift(metadata);
+          fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, audio: metadata }));
+          return;
+        }
+
+        // --- Free Neural Speech Engine ---
         const voiceModel = selectedVoice.underlyingVoice || selectedVoice.id;
         const timestamp = Date.now();
         const snippet = sanitize(cleanedText.replace(/\s+/g, '_'));
@@ -869,8 +1200,24 @@ server.listen(PORT, () => {
   console.log(`  Audio Directory: ${OUTPUT_DIR}`);
   console.log(`======================================================\n`);
 
-  // Pre-cache preview audio for featured voices in background
+  // Pre-cache preview audio for ElevenLabs and featured voices in background
   (async () => {
+    for (const elv of ELEVENLABS_VOICES.slice(0, 12)) {
+      const previewFile = path.join(PREVIEW_DIR, `el_${sanitize(elv.id)}.mp3`);
+      if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {
+        if (elv.previewUrl) {
+          try {
+            const resp = await fetch(elv.previewUrl);
+            if (resp.ok) {
+              const buf = Buffer.from(await resp.arrayBuffer());
+              fs.writeFileSync(previewFile, buf);
+            }
+          } catch (_) {}
+        }
+      }
+    }
+    console.log(`[Preview Cache] Authentic ElevenLabs voice previews ready.`);
+
     for (const fv of FEATURED_VOICES) {
       const previewFile = path.join(PREVIEW_DIR, `${sanitize(fv.id)}.mp3`);
       if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {

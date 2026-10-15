@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Free AI Voice Studio - 320+ Neural Voices</title>
+  <title>AI Voice Studio Pro - ElevenLabs Official & Free Neural Engine</title>
   <style>
     :root {
       --bg: #0b0f19;
@@ -20,6 +20,9 @@
       --tag-bg: rgba(99, 102, 241, 0.15);
       --tag-border: rgba(99, 102, 241, 0.3);
       --success: #10b981;
+      --warning: #f59e0b;
+      --gold: #f59e0b;
+      --danger: #ef4444;
     }
 
     * {
@@ -41,12 +44,14 @@
     }
 
     header {
-      padding: 16px 40px;
+      padding: 16px 36px;
       border-bottom: 1px solid var(--card-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       backdrop-filter: blur(10px);
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .brand {
@@ -56,8 +61,8 @@
     }
 
     .brand-icon {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(135deg, #6366f1, #a855f7);
       border-radius: 10px;
       display: flex;
@@ -72,6 +77,52 @@
       letter-spacing: -0.5px;
     }
 
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-key-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    .btn-key-status.connected {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .btn-key-status.missing {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
     .badge-count {
       background: rgba(99, 102, 241, 0.2);
       color: #a5b4fc;
@@ -82,30 +133,18 @@
       font-weight: 600;
     }
 
-    .badge-free {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
     main {
-      max-width: 1300px;
+      max-width: 1350px;
       width: 100%;
       margin: 0 auto;
       padding: 24px 20px;
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: 1fr 390px;
       gap: 24px;
       flex: 1;
     }
 
-    @media (max-width: 960px) {
+    @media (max-width: 1024px) {
       main {
         grid-template-columns: 1fr;
       }
@@ -128,6 +167,109 @@
       justify-content: space-between;
     }
 
+    /* Engine Selector Bar */
+    .engine-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .engine-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .engine-tab {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    .engine-tab:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .engine-tab.active {
+      background: rgba(99, 102, 241, 0.16);
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .engine-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .engine-details {
+      flex: 1;
+    }
+
+    .engine-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: block;
+      color: var(--text);
+    }
+
+    .engine-subtitle {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .engine-pill {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .engine-pill.premium {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .engine-pill.free {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    /* API Key Alert Banner */
+    .api-key-banner {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      flex-wrap: wrap;
+    }
+
+    .api-key-banner strong {
+      color: #fbbf24;
+    }
+
     /* Text Input Area */
     .textarea-container {
       position: relative;
@@ -136,8 +278,8 @@
 
     textarea {
       width: 100%;
-      height: 160px;
-      background: rgba(11, 15, 25, 0.7);
+      height: 150px;
+      background: rgba(11, 15, 25, 0.75);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 14px;
@@ -176,6 +318,7 @@
     .tabs {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
@@ -242,7 +385,7 @@
 
     .voice-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 10px;
     }
 
@@ -268,6 +411,11 @@
       border-color: var(--accent);
       background: rgba(99, 102, 241, 0.15);
       box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .voice-card.active.elevenlabs {
+      border-color: #818cf8;
+      background: rgba(99, 102, 241, 0.2);
     }
 
     /* Voice Preview Play Button */
@@ -309,16 +457,16 @@
       100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
     }
 
-    /* Small Star Toggle Button */
+    /* Star Toggle Button */
     .btn-star {
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
       color: rgba(255, 255, 255, 0.35);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -357,21 +505,21 @@
 
     .voice-name {
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
     }
 
-    .voice-counterpart {
-      font-size: 0.7rem;
-      color: #818cf8;
-      background: var(--tag-bg);
-      border: 1px solid var(--tag-border);
+    .badge-el {
+      font-size: 0.68rem;
       padding: 2px 6px;
       border-radius: 4px;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
       font-weight: 500;
     }
 
-    .voice-locale {
-      font-size: 0.72rem;
+    .badge-locale {
+      font-size: 0.7rem;
       color: #34d399;
       background: rgba(16, 185, 129, 0.1);
       padding: 2px 6px;
@@ -387,25 +535,16 @@
       text-overflow: ellipsis;
     }
 
-    /* Controls (Sliders) */
-    /* Controls (Sliders, Quality & Mood) */
-    .controls-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1.2fr;
-      gap: 12px;
+    /* Controls Rows */
+    .controls-section {
       margin-bottom: 18px;
     }
 
-    @media (max-width: 1050px) {
-      .controls-row {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .controls-row {
-        grid-template-columns: 1fr;
-      }
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .control-group {
@@ -428,10 +567,48 @@
       color: var(--text);
     }
 
+    .control-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
     input[type=range] {
       width: 100%;
       accent-color: var(--accent);
       cursor: pointer;
+    }
+
+    /* Preset Mood Pills */
+    .preset-pills-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.76rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill-btn:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+    }
+
+    .pill-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
     }
 
     /* Action Buttons */
@@ -484,6 +661,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .player-info {
@@ -663,6 +842,78 @@
       color: #ffffff !important;
     }
 
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #121826;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.2s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .key-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-toggle-eye {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    .btn-toggle-eye:hover {
+      opacity: 1;
+    }
+
     /* Spinner */
     .spinner {
       width: 18px;
@@ -684,22 +935,26 @@
   <header>
     <div class="brand">
       <div class="brand-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
           <line x1="12" y1="19" x2="12" y2="22"/>
         </svg>
       </div>
       <div>
-        <h1>Free AI Voice Studio</h1>
+        <h1>AI Voice Studio Pro</h1>
+        <div class="brand-sub">Authentic ElevenLabs Voice Models &bull; Free Neural Studio</div>
       </div>
     </div>
-    <div style="display: flex; gap: 12px; align-items: center;">
+    <div class="header-actions">
+      <button class="btn-key-status missing" id="headerKeyBtn" onclick="openKeyModal()">
+        <span class="status-dot"></span>
+        <span id="headerKeyText">🔑 ElevenLabs API Key</span>
+      </button>
       <a href="/editor.html" target="_blank" class="tab-btn" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #c7d2fe; font-size: 0.82rem; padding: 6px 14px; border-radius: 8px;">
         ✂️ Open Audio Editor
       </a>
-      <span class="badge-count" id="totalVoiceCount">322 Voices</span>
-      <span class="badge-free">100% Free & Unlimited</span>
+      <span class="badge-count" id="totalVoiceCount">ElevenLabs + 322 Neural</span>
     </div>
   </header>
 
@@ -707,8 +962,40 @@
     <!-- Left Column: Generator -->
     <div>
       <div class="card">
+        <!-- Dual Engine Switcher -->
+        <div class="engine-bar">
+          <button class="engine-tab active" id="engineBtnElevenLabs" onclick="switchEngine('elevenlabs')">
+            <span class="engine-icon">✨</span>
+            <div class="engine-details">
+              <span class="engine-title">ElevenLabs Official Engine</span>
+              <span class="engine-subtitle">Exact Adam, Daniel, Brian, Lily &bull; Live Emotion &amp; Pitch Inflections</span>
+            </div>
+            <span class="engine-pill premium">Authentic</span>
+          </button>
+          <button class="engine-tab" id="engineBtnFree" onclick="switchEngine('free')">
+            <span class="engine-icon">🌐</span>
+            <div class="engine-details">
+              <span class="engine-title">Free Studio Engine</span>
+              <span class="engine-subtitle">320+ Neural Voices &bull; 100% Free &amp; Unlimited</span>
+            </div>
+            <span class="engine-pill free">0$ Free</span>
+          </button>
+        </div>
+
+        <!-- API Key Status Banner for ElevenLabs -->
+        <div class="api-key-banner" id="apiKeyBanner" style="display: none;">
+          <div>
+            <strong>🔑 ElevenLabs Mode Active:</strong> Enter your API key to generate speech with authentic ElevenLabs voice models and emotion sliders.
+            <span style="opacity: 0.85;">(10,000 characters free every month at elevenlabs.io)</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-tiny" onclick="openKeyModal()" style="background: var(--accent); color: white; border-color: var(--accent);">🔑 Enter API Key</button>
+            <a class="btn-tiny" href="https://elevenlabs.io" target="_blank" rel="noopener" style="text-decoration: none;">Get Free Key ↗</a>
+          </div>
+        </div>
+
         <div class="card-title">
-          <span>Script / Prompt</span>
+          <span>Script / Story Prompt</span>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button class="btn-tiny" id="cleanScriptBtn" onclick="cleanScriptPrompt()" title="Clean subtitle markers like [संगीत], [Music], timestamps, and bracketed noise">
               🧹 Clean [संगीत] Tags
@@ -718,7 +1005,7 @@
         </div>
 
         <div class="textarea-container">
-          <textarea id="promptText" placeholder="Enter any text or story here to synthesize speech...">In a quiet village where the shadows whispered secrets, an ancient mystery was waiting to be uncovered.</textarea>
+          <textarea id="promptText" placeholder="Enter any story, script, or dialogue to synthesize speech with authentic voice emotion...">In a quiet village where the shadows whispered ancient secrets, Brian looked up at the stormy sky. "Whatever happens tonight," he murmured, his voice heavy with tension, "we cannot turn back now."</textarea>
           <div class="text-stats">
             <span id="charCount">0 characters</span>
             <span id="wordCount">0 words</span>
@@ -727,16 +1014,16 @@
 
         <!-- Voice Selection Tabs & Filters -->
         <div class="voice-nav">
-          <div class="tabs">
-            <button class="tab-btn active" id="tabAll" onclick="switchTab('all')">🌐 All 320+ Voices</button>
-            <button class="tab-btn" id="tabFeatured" onclick="switchTab('featured')">⭐ My Featured Voices (<span id="featuredCount">0</span>)</button>
+          <div class="tabs" id="voiceNavTabs">
+            <button class="tab-btn active" id="tabVoiceMain" onclick="switchVoiceTab('main')">✨ Official ElevenLabs Voices</button>
+            <button class="tab-btn" id="tabVoiceStarred" onclick="switchVoiceTab('starred')">⭐ Starred (<span id="featuredCount">0</span>)</button>
           </div>
-          <span id="voiceCountDisplay" style="font-size: 0.8rem; color: var(--text-muted);">322 voices</span>
+          <span id="voiceCountDisplay" style="font-size: 0.8rem; color: var(--text-muted);">24 ElevenLabs Models</span>
         </div>
 
-        <!-- Filter Bar (active when browsing all voices) -->
-        <div class="filter-bar" id="filterBar" style="display: grid;">
-          <input type="text" class="input-filter" id="searchInput" placeholder="Search by voice name or accent (e.g. Indian, British, Guy)...">
+        <!-- Filter Bar (active in Free engine mode) -->
+        <div class="filter-bar" id="filterBar" style="display: none;">
+          <input type="text" class="input-filter" id="searchInput" placeholder="Search voices by name, accent, or style (e.g. British, Indian, Madhur)...">
           <select class="input-filter" id="langSelect">
             <option value="ALL">All Languages</option>
             <option value="en">English (All Regions)</option>
@@ -764,52 +1051,114 @@
           </div>
         </div>
 
-        <div class="controls-row">
-          <div class="control-group">
-            <div class="control-label-row">
-              <span>Speech Speed (Rate)</span>
-              <span class="control-value" id="rateVal">1.0x</span>
+        <!-- ElevenLabs Controls Section -->
+        <div class="controls-section" id="elevenlabsControls">
+          <div class="controls-row">
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Voice Stability</span>
+                <span class="control-value" id="stabilityVal">0.40 (Dynamic Emotion)</span>
+              </div>
+              <input type="range" id="stabilitySlider" min="0" max="100" value="40">
+              <div class="control-hint">Lower = dynamic, emotional voice &amp; natural breathing. Higher = steady.</div>
             </div>
-            <input type="range" id="rateSlider" min="-30" max="50" value="0">
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Clarity &amp; Similarity</span>
+                <span class="control-value" id="similarityVal">0.85 (High Fidelity)</span>
+              </div>
+              <input type="range" id="similaritySlider" min="0" max="100" value="85">
+              <div class="control-hint">Boosts fidelity and matches original speaker's exact timbre.</div>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Style Exaggeration</span>
+                <span class="control-value" id="styleVal">0.35 (Dramatic Expression)</span>
+              </div>
+              <input type="range" id="styleSlider" min="0" max="100" value="35">
+              <div class="control-hint">Amplifies speaker dramatic intent, passion, and theatrical expression.</div>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>AI Model</span>
+                <span class="control-value" style="color: #818cf8; font-size: 0.78rem;">Multilingual v2</span>
+              </div>
+              <select id="elModelSelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
+                <option value="eleven_multilingual_v2" selected>⭐ Multilingual v2 (Highest Emotion &amp; 29 Languages)</option>
+                <option value="eleven_turbo_v2_5">⚡ Turbo v2.5 (Ultra-Fast Low Latency)</option>
+              </select>
+              <div style="margin-top: 8px; display: flex; align-items: center; gap: 6px;">
+                <input type="checkbox" id="speakerBoostCheck" checked style="accent-color: var(--accent); cursor: pointer;">
+                <label for="speakerBoostCheck" style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer;">Speaker Boost (Crisp Presence)</label>
+              </div>
+            </div>
           </div>
-          <div class="control-group">
-            <div class="control-label-row">
-              <span>Voice Pitch</span>
-              <span class="control-value" id="pitchVal">Normal</span>
+
+          <!-- Quick Emotion Presets for ElevenLabs -->
+          <div style="margin-top: 6px;">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Quick Emotion Presets:</span>
+            <div class="preset-pills-row">
+              <button class="pill-btn" onclick="applyElevenLabsPreset('suspense')">🎭 Dramatic Suspense (Dark/Thriller)</button>
+              <button class="pill-btn" onclick="applyElevenLabsPreset('audiobook')">📖 Engaging Audiobook Storyteller</button>
+              <button class="pill-btn" onclick="applyElevenLabsPreset('action')">⚡ Action &amp; Intensity</button>
+              <button class="pill-btn" onclick="applyElevenLabsPreset('conversational')">🎙️ Natural Conversational</button>
+              <button class="pill-btn" onclick="applyElevenLabsPreset('calm')">🌊 Calm &amp; Deep Meditation</button>
             </div>
-            <input type="range" id="pitchSlider" min="-30" max="30" value="0">
           </div>
-          <div class="control-group">
-            <div class="control-label-row">
-              <span>Audio Quality</span>
-              <span class="control-value" id="qualityLabelBadge" style="color: #34d399; font-size: 0.78rem;">High (96k)</span>
+        </div>
+
+        <!-- Free Engine Controls Section -->
+        <div class="controls-section" id="freeControls" style="display: none;">
+          <div class="controls-row">
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Speech Speed (Rate)</span>
+                <span class="control-value" id="rateVal">1.0x</span>
+              </div>
+              <input type="range" id="rateSlider" min="-30" max="50" value="0">
             </div>
-            <select id="qualitySelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
-              <option value="high" selected>✨ High Quality (96k MP3)</option>
-              <option value="standard">⚡ Basic / Standard (48k MP3)</option>
-              <option value="opus">💎 Ultra HD Voice (Opus)</option>
-            </select>
-          </div>
-          <div class="control-group">
-            <div class="control-label-row">
-              <span>Tone & Expression</span>
-              <span class="control-value" id="moodLabelBadge" style="color: #34d399; font-size: 0.78rem;">🎙️ Pure Human Studio</span>
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Voice Pitch</span>
+                <span class="control-value" id="pitchVal">Normal</span>
+              </div>
+              <input type="range" id="pitchSlider" min="-30" max="30" value="0">
             </div>
-            <select id="moodSelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
-              <option value="studio" selected>🎙️ Pure Human Studio (100% Natural)</option>
-              <option value="suspense">🎭 Dramatic & Suspense (Stories)</option>
-              <option value="horror">🌑 Deep Mystery & Thriller</option>
-              <option value="story">📖 Engaging Storyteller</option>
-              <option value="fast">⚡ Action Thriller (High Tempo)</option>
-              <option value="normal">🎙️ Conversational / Neutral</option>
-            </select>
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Audio Quality</span>
+                <span class="control-value" id="qualityLabelBadge" style="color: #34d399; font-size: 0.78rem;">High (96k)</span>
+              </div>
+              <select id="qualitySelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
+                <option value="high" selected>✨ High Quality (96k MP3)</option>
+                <option value="standard">⚡ Basic / Standard (48k MP3)</option>
+                <option value="opus">💎 Ultra HD Voice (Opus)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>Tone &amp; Expression</span>
+                <span class="control-value" id="moodLabelBadge" style="color: #34d399; font-size: 0.78rem;">🎙️ Pure Human Studio</span>
+              </div>
+              <select id="moodSelect" class="input-filter" style="width: 100%; padding: 5px 8px; font-size: 0.82rem; background: rgba(11, 15, 25, 0.6);">
+                <option value="studio" selected>🎙️ Pure Human Studio (100% Natural)</option>
+                <option value="suspense">🎭 Dramatic &amp; Suspense (Stories)</option>
+                <option value="horror">🌑 Deep Mystery &amp; Thriller</option>
+                <option value="story">📖 Engaging Storyteller</option>
+                <option value="fast">⚡ Action Thriller (High Tempo)</option>
+                <option value="normal">🎙️ Conversational / Neutral</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div class="actions">
           <button class="btn-generate" id="generateBtn">
             <div class="spinner" id="spinner"></div>
-            <span id="btnText">Generate Audio</span>
+            <span id="btnText">✨ Generate Voice Speech</span>
           </button>
         </div>
 
@@ -878,20 +1227,63 @@
     </div>
   </main>
 
-  <script>
-    let allVoices = [];
-    let currentTab = 'all';
-    let selectedVoiceId = localStorage.getItem('last_selected_voice') || 'en-US-AndrewMultilingualNeural';
-    let starredVoiceIds = new Set(JSON.parse(localStorage.getItem('my_featured_voices') || '[]'));
+  <!-- ElevenLabs API Key Modal -->
+  <div class="modal-overlay" id="keyModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+          <span>🔑</span> Connect ElevenLabs API Key
+        </h3>
+        <button class="modal-close" onclick="closeKeyModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+          Enter your ElevenLabs API Key to generate speech with authentic voice models (<strong>Adam, Daniel, Brian, Lily, Callum, etc.</strong>) and dynamic AI emotion sliders.
+        </p>
 
+        <div class="key-input-container">
+          <input type="password" id="modalApiKeyInput" placeholder="Enter xi-api-key (e.g. sk_...)" class="input-filter" style="width: 100%; padding: 10px 38px 10px 12px; font-family: monospace;">
+          <button class="btn-toggle-eye" onclick="toggleKeyVisibility()" title="Show/Hide Key">👁️</button>
+        </div>
+
+        <div id="keyVerificationResult" style="margin-top: 10px; font-size: 0.82rem; display: none;"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 10px;">
+          <a href="https://elevenlabs.io" target="_blank" rel="noopener" style="font-size: 0.8rem; color: #818cf8; text-decoration: none;">
+            Get Free Key (10,000 chars/month free) ↗
+          </a>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-tiny btn-danger" onclick="clearApiKey()" id="btnClearKey" style="display: none;">Remove Key</button>
+            <button class="btn-tiny" onclick="verifyAndSaveKey()" id="btnVerifyKey" style="background: var(--accent); color: white; padding: 6px 16px;">Verify &amp; Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentEngine = localStorage.getItem('last_engine_mode') || 'elevenlabs';
+    let currentVoiceTab = 'main';
+    let allVoices = [];
+    let elevenlabsVoices = [];
+    let freeVoices = [];
+    let selectedVoiceId = localStorage.getItem('last_selected_voice') || 'pNInz6obpgDQGcFmaJgB'; // Adam by default
+    let starredVoiceIds = new Set(JSON.parse(localStorage.getItem('my_featured_voices') || '[]'));
+    let currentPreviewAudio = null;
+    let currentPlayingVoiceId = null;
+
+    // DOM Elements
     const promptText = document.getElementById('promptText');
     const charCount = document.getElementById('charCount');
     const wordCount = document.getElementById('wordCount');
     const voiceGrid = document.getElementById('voiceGrid');
-    const rateSlider = document.getElementById('rateSlider');
-    const pitchSlider = document.getElementById('pitchSlider');
-    const rateVal = document.getElementById('rateVal');
-    const pitchVal = document.getElementById('pitchVal');
+    const filterBar = document.getElementById('filterBar');
+    const searchInput = document.getElementById('searchInput');
+    const langSelect = document.getElementById('langSelect');
+    const genderSelect = document.getElementById('genderSelect');
+    const voiceCountDisplay = document.getElementById('voiceCountDisplay');
+    const totalVoiceCount = document.getElementById('totalVoiceCount');
     const generateBtn = document.getElementById('generateBtn');
     const btnText = document.getElementById('btnText');
     const spinner = document.getElementById('spinner');
@@ -901,13 +1293,184 @@
     const downloadBtn = document.getElementById('downloadBtn');
     const editAudioBtn = document.getElementById('editAudioBtn');
     const historyList = document.getElementById('historyList');
-    const filterBar = document.getElementById('filterBar');
-    const searchInput = document.getElementById('searchInput');
-    const langSelect = document.getElementById('langSelect');
-    const genderSelect = document.getElementById('genderSelect');
-    const voiceCountDisplay = document.getElementById('voiceCountDisplay');
-    const totalVoiceCount = document.getElementById('totalVoiceCount');
 
+    // Controls DOM
+    const elevenlabsControls = document.getElementById('elevenlabsControls');
+    const freeControls = document.getElementById('freeControls');
+    const apiKeyBanner = document.getElementById('apiKeyBanner');
+    const headerKeyBtn = document.getElementById('headerKeyBtn');
+    const headerKeyText = document.getElementById('headerKeyText');
+
+    // ElevenLabs Controls
+    const stabilitySlider = document.getElementById('stabilitySlider');
+    const similaritySlider = document.getElementById('similaritySlider');
+    const styleSlider = document.getElementById('styleSlider');
+    const stabilityVal = document.getElementById('stabilityVal');
+    const similarityVal = document.getElementById('similarityVal');
+    const styleVal = document.getElementById('styleVal');
+    const elModelSelect = document.getElementById('elModelSelect');
+    const speakerBoostCheck = document.getElementById('speakerBoostCheck');
+
+    // Free Controls
+    const rateSlider = document.getElementById('rateSlider');
+    const pitchSlider = document.getElementById('pitchSlider');
+    const rateVal = document.getElementById('rateVal');
+    const pitchVal = document.getElementById('pitchVal');
+    const qualitySelect = document.getElementById('qualitySelect');
+    const qualityLabelBadge = document.getElementById('qualityLabelBadge');
+    const moodSelect = document.getElementById('moodSelect');
+    const moodLabelBadge = document.getElementById('moodLabelBadge');
+
+    // Modal DOM
+    const keyModal = document.getElementById('keyModal');
+    const modalApiKeyInput = document.getElementById('modalApiKeyInput');
+    const keyVerificationResult = document.getElementById('keyVerificationResult');
+    const btnClearKey = document.getElementById('btnClearKey');
+    const btnVerifyKey = document.getElementById('btnVerifyKey');
+
+    // API Key Storage & Status
+    function getStoredApiKey() {
+      return localStorage.getItem('elevenlabs_api_key') || '';
+    }
+
+    function updateApiKeyUI() {
+      const key = getStoredApiKey();
+      if (key) {
+        headerKeyBtn.className = 'btn-key-status connected';
+        headerKeyText.textContent = '🔑 ElevenLabs Connected';
+        if (apiKeyBanner) apiKeyBanner.style.display = 'none';
+        if (btnClearKey) btnClearKey.style.display = 'inline-flex';
+      } else {
+        headerKeyBtn.className = 'btn-key-status missing';
+        headerKeyText.textContent = '🔑 Enter ElevenLabs Key';
+        if (currentEngine === 'elevenlabs' && apiKeyBanner) {
+          apiKeyBanner.style.display = 'flex';
+        } else if (apiKeyBanner) {
+          apiKeyBanner.style.display = 'none';
+        }
+        if (btnClearKey) btnClearKey.style.display = 'none';
+      }
+    }
+
+    function openKeyModal() {
+      const key = getStoredApiKey();
+      modalApiKeyInput.value = key;
+      keyVerificationResult.style.display = 'none';
+      keyModal.style.display = 'flex';
+    }
+
+    function closeKeyModal() {
+      keyModal.style.display = 'none';
+    }
+
+    function toggleKeyVisibility() {
+      modalApiKeyInput.type = modalApiKeyInput.type === 'password' ? 'text' : 'password';
+    }
+
+    async function verifyAndSaveKey() {
+      const key = modalApiKeyInput.value.trim();
+      if (!key) {
+        alert('Please enter your ElevenLabs API Key.');
+        return;
+      }
+
+      btnVerifyKey.disabled = true;
+      btnVerifyKey.textContent = 'Verifying...';
+      keyVerificationResult.style.display = 'block';
+      keyVerificationResult.style.color = '#a5b4fc';
+      keyVerificationResult.textContent = 'Testing connection with ElevenLabs API...';
+
+      try {
+        const res = await fetch('/api/elevenlabs/verify-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey: key })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.valid) {
+          localStorage.setItem('elevenlabs_api_key', key);
+          keyVerificationResult.style.color = '#34d399';
+          const remaining = (data.characterLimit - data.characterCount).toLocaleString();
+          keyVerificationResult.innerHTML = `✓ Connected! Tier: <strong>${data.tier}</strong> &bull; Remaining: <strong>${remaining}</strong> chars`;
+          updateApiKeyUI();
+          setTimeout(() => {
+            closeKeyModal();
+          }, 1200);
+        } else {
+          keyVerificationResult.style.color = '#f87171';
+          keyVerificationResult.textContent = data.error || 'Verification failed. Please check your key.';
+        }
+      } catch (err) {
+        keyVerificationResult.style.color = '#f87171';
+        keyVerificationResult.textContent = 'Error verifying key: ' + err.message;
+      } finally {
+        btnVerifyKey.disabled = false;
+        btnVerifyKey.textContent = 'Verify & Save';
+      }
+    }
+
+    function clearApiKey() {
+      if (confirm('Are you sure you want to remove your stored ElevenLabs API Key?')) {
+        localStorage.removeItem('elevenlabs_api_key');
+        modalApiKeyInput.value = '';
+        keyVerificationResult.style.display = 'none';
+        updateApiKeyUI();
+        closeKeyModal();
+      }
+    }
+
+    // Engine Switcher
+    function switchEngine(engine) {
+      currentEngine = engine;
+      localStorage.setItem('last_engine_mode', engine);
+
+      document.getElementById('engineBtnElevenLabs').classList.toggle('active', engine === 'elevenlabs');
+      document.getElementById('engineBtnFree').classList.toggle('active', engine === 'free');
+
+      if (engine === 'elevenlabs') {
+        elevenlabsControls.style.display = 'block';
+        freeControls.style.display = 'none';
+        filterBar.style.display = 'none';
+        document.getElementById('tabVoiceMain').textContent = '✨ Official ElevenLabs Voices';
+        btnText.textContent = '✨ Generate ElevenLabs Speech';
+
+        // Set default ElevenLabs voice if current is not ElevenLabs
+        if (!elevenlabsVoices.some(v => v.id === selectedVoiceId)) {
+          selectedVoiceId = 'pNInz6obpgDQGcFmaJgB'; // Adam
+        }
+      } else {
+        elevenlabsControls.style.display = 'none';
+        freeControls.style.display = 'block';
+        filterBar.style.display = currentVoiceTab === 'main' ? 'grid' : 'none';
+        document.getElementById('tabVoiceMain').textContent = '🌐 All 320+ Voices';
+        btnText.textContent = '🌐 Generate Free Audio';
+
+        // Set default Free voice if current is ElevenLabs
+        if (elevenlabsVoices.some(v => v.id === selectedVoiceId)) {
+          selectedVoiceId = 'en-US-AndrewMultilingualNeural';
+        }
+      }
+
+      updateApiKeyUI();
+      renderVoices();
+    }
+
+    // Voice Tab Switcher (Main vs Starred)
+    function switchVoiceTab(tab) {
+      currentVoiceTab = tab;
+      document.getElementById('tabVoiceMain').classList.toggle('active', tab === 'main');
+      document.getElementById('tabVoiceStarred').classList.toggle('active', tab === 'starred');
+
+      if (currentEngine === 'free') {
+        filterBar.style.display = tab === 'main' ? 'grid' : 'none';
+      } else {
+        filterBar.style.display = 'none';
+      }
+      renderVoices();
+    }
+
+    // Script Cleaner
     function cleanScriptPrompt() {
       const original = promptText.value;
       const cleaned = original
@@ -933,7 +1496,62 @@
     promptText.addEventListener('input', updateStats);
     updateStats();
 
-    // Rate / Pitch formatting
+    // ElevenLabs Sliders Formatting
+    stabilitySlider.addEventListener('input', () => {
+      const v = parseInt(stabilitySlider.value, 10);
+      const dec = (v / 100).toFixed(2);
+      let desc = 'Dynamic Emotion';
+      if (v <= 25) desc = 'Intense & Unstable Emotion';
+      else if (v <= 45) desc = 'Expressive & Dynamic';
+      else if (v <= 70) desc = 'Balanced & Steady';
+      else desc = 'Consistent & Calm';
+      stabilityVal.textContent = `${dec} (${desc})`;
+    });
+
+    similaritySlider.addEventListener('input', () => {
+      const v = parseInt(similaritySlider.value, 10);
+      const dec = (v / 100).toFixed(2);
+      similarityVal.textContent = `${dec} (${v >= 80 ? 'High Fidelity' : 'Natural'})`;
+    });
+
+    styleSlider.addEventListener('input', () => {
+      const v = parseInt(styleSlider.value, 10);
+      const dec = (v / 100).toFixed(2);
+      let desc = 'Subtle';
+      if (v >= 50) desc = 'Intense Drama & Passion';
+      else if (v >= 30) desc = 'Dramatic Expression';
+      else if (v > 10) desc = 'Natural Expression';
+      styleVal.textContent = `${dec} (${desc})`;
+    });
+
+    function applyElevenLabsPreset(preset) {
+      if (preset === 'suspense') {
+        stabilitySlider.value = 28;
+        similaritySlider.value = 85;
+        styleSlider.value = 55;
+      } else if (preset === 'audiobook') {
+        stabilitySlider.value = 42;
+        similaritySlider.value = 85;
+        styleSlider.value = 30;
+      } else if (preset === 'action') {
+        stabilitySlider.value = 32;
+        similaritySlider.value = 90;
+        styleSlider.value = 65;
+      } else if (preset === 'conversational') {
+        stabilitySlider.value = 50;
+        similaritySlider.value = 80;
+        styleSlider.value = 15;
+      } else if (preset === 'calm') {
+        stabilitySlider.value = 65;
+        similaritySlider.value = 85;
+        styleSlider.value = 10;
+      }
+      stabilitySlider.dispatchEvent(new Event('input'));
+      similaritySlider.dispatchEvent(new Event('input'));
+      styleSlider.dispatchEvent(new Event('input'));
+    }
+
+    // Free Controls Sliders
     rateSlider.addEventListener('input', () => {
       const v = parseInt(rateSlider.value, 10);
       const mult = (1 + v / 100).toFixed(2);
@@ -944,220 +1562,6 @@
       const v = parseInt(pitchSlider.value, 10);
       pitchVal.textContent = v === 0 ? 'Natural Studio' : (v > 0 ? `+${v}Hz` : `${v}Hz`);
     });
-
-    function updateFeaturedCount() {
-      const el = document.getElementById('featuredCount');
-      if (el) el.textContent = starredVoiceIds.size;
-    }
-
-    function toggleStar(e, voiceId) {
-      e.stopPropagation();
-      if (starredVoiceIds.has(voiceId)) {
-        starredVoiceIds.delete(voiceId);
-      } else {
-        starredVoiceIds.add(voiceId);
-      }
-      localStorage.setItem('my_featured_voices', JSON.stringify([...starredVoiceIds]));
-      updateFeaturedCount();
-      renderVoices();
-    }
-
-    function switchTab(tab) {
-      currentTab = tab;
-      document.getElementById('tabFeatured').classList.toggle('active', tab === 'featured');
-      document.getElementById('tabAll').classList.toggle('active', tab === 'all');
-      filterBar.style.display = tab === 'all' ? 'grid' : 'none';
-      renderVoices();
-    }
-
-    function renderVoices() {
-      voiceGrid.innerHTML = '';
-      let list = allVoices;
-
-      if (currentTab === 'featured') {
-        list = allVoices.filter(v => starredVoiceIds.has(v.id));
-        voiceCountDisplay.textContent = `${list.length} featured voice${list.length === 1 ? '' : 's'}`;
-
-        if (list.length === 0) {
-          voiceGrid.innerHTML = `
-            <div style="grid-column: 1/-1; padding: 40px 20px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--card-border); border-radius: 14px;">
-              <div style="font-size: 2.2rem; margin-bottom: 8px;">⭐</div>
-              <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; color: var(--text);">Your Featured Voices is Empty</div>
-              <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 440px; margin: 0 auto 16px; line-height: 1.5;">
-                You have full control! Go to <strong>All 320+ Voices</strong> and click the small <strong>☆ Star</strong> on any voice to pin it into your Featured list.
-              </p>
-              <button class="tab-btn" onclick="switchTab('all')" style="display: inline-block; background: var(--accent); color: white; padding: 8px 20px;">Browse All 320+ Voices</button>
-            </div>
-          `;
-          return;
-        }
-      } else {
-        const query = searchInput.value.toLowerCase().trim();
-        const lang = langSelect.value;
-        const gender = genderSelect.value;
-
-        list = allVoices.filter(v => {
-          if (gender !== 'ALL' && v.gender !== gender) return false;
-          if (lang !== 'ALL') {
-            if (lang.includes('-')) {
-              if (v.locale !== lang) return false;
-            } else {
-              if (!v.locale.startsWith(lang)) return false;
-            }
-          }
-          if (query) {
-            const matchName = v.name.toLowerCase().includes(query);
-            const matchLocale = v.localeName.toLowerCase().includes(query);
-            const matchTag = (v.tag || '').toLowerCase().includes(query);
-            const matchCounterpart = (v.counterpart || '').toLowerCase().includes(query);
-            if (!matchName && !matchLocale && !matchTag && !matchCounterpart) return false;
-          }
-          return true;
-        });
-
-        voiceCountDisplay.textContent = `${list.length} voice${list.length === 1 ? '' : 's'}`;
-
-        if (list.length === 0) {
-          voiceGrid.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; grid-column: 1/-1; padding: 20px; text-align: center;">No voices match your search query.</p>';
-          return;
-        }
-      }
-
-      list.forEach(voice => {
-        const card = document.createElement('div');
-        card.className = `voice-card ${voice.id === selectedVoiceId ? 'active' : ''}`;
-        
-        let badgeHtml = '';
-        if (voice.counterpart) {
-          badgeHtml = `<span class="voice-counterpart">${voice.counterpart}</span>`;
-        } else {
-          badgeHtml = `<span class="voice-locale">${voice.gender}, ${voice.localeName.split(' (')[0]}</span>`;
-        }
-
-        const isPlaying = voice.id === currentPlayingVoiceId;
-        const playIcon = isPlaying
-          ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
-          : `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
-
-        const isStarred = starredVoiceIds.has(voice.id);
-        const starIcon = isStarred ? '★' : '☆';
-
-        card.innerHTML = `
-          <button class="btn-preview-play ${isPlaying ? 'playing' : ''}" data-voice-id="${voice.id}" title="${isPlaying ? 'Stop Preview' : 'Listen Preview'}" onclick="togglePreview(event, '${voice.id}')">
-            ${playIcon}
-          </button>
-          <div class="voice-card-content">
-            <div class="voice-card-header">
-              <span class="voice-name">${voice.name}</span>
-              ${badgeHtml}
-            </div>
-            <div class="voice-desc">${voice.tag || voice.localeName}</div>
-          </div>
-          <button class="btn-star ${isStarred ? 'starred' : ''}" data-voice-id="${voice.id}" title="${isStarred ? 'Remove from Featured' : 'Add to Featured'}" onclick="toggleStar(event, '${voice.id}')">
-            ${starIcon}
-          </button>
-        `;
-        card.setAttribute('data-voice-id', voice.id);
-        card.onclick = () => {
-          document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-          selectedVoiceId = voice.id;
-          localStorage.setItem('last_selected_voice', voice.id);
-        };
-        voiceGrid.appendChild(card);
-      });
-    }
-
-    // Voice Preview Audio Player
-    let currentPreviewAudio = null;
-    let currentPlayingVoiceId = null;
-
-    function togglePreview(e, voiceId) {
-      e.stopPropagation();
-
-      // If already playing this voice, stop it
-      if (currentPlayingVoiceId === voiceId && currentPreviewAudio) {
-        currentPreviewAudio.pause();
-        currentPreviewAudio = null;
-        currentPlayingVoiceId = null;
-        updatePreviewButtons();
-        return;
-      }
-
-      // Stop any other currently playing preview
-      if (currentPreviewAudio) {
-        currentPreviewAudio.pause();
-        currentPreviewAudio = null;
-      }
-
-      currentPlayingVoiceId = voiceId;
-      updatePreviewButtons();
-
-      const audio = new Audio(`/api/preview?voiceId=${encodeURIComponent(voiceId)}`);
-      currentPreviewAudio = audio;
-
-      audio.onplay = () => {
-        updatePreviewButtons();
-      };
-
-      audio.onended = () => {
-        currentPlayingVoiceId = null;
-        currentPreviewAudio = null;
-        updatePreviewButtons();
-      };
-
-      audio.onerror = () => {
-        console.error('Failed to load preview for voice:', voiceId);
-        currentPlayingVoiceId = null;
-        currentPreviewAudio = null;
-        updatePreviewButtons();
-      };
-
-      audio.play().catch(err => {
-        console.error('Audio play error:', err);
-        currentPlayingVoiceId = null;
-        currentPreviewAudio = null;
-        updatePreviewButtons();
-      });
-    }
-
-    function updatePreviewButtons() {
-      document.querySelectorAll('.btn-preview-play').forEach(btn => {
-        const vId = btn.getAttribute('data-voice-id');
-        if (vId === currentPlayingVoiceId) {
-          btn.classList.add('playing');
-          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
-          btn.title = "Stop Preview";
-        } else {
-          btn.classList.remove('playing');
-          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
-          btn.title = "Listen Preview";
-        }
-      });
-    }
-
-    searchInput.addEventListener('input', renderVoices);
-    langSelect.addEventListener('change', renderVoices);
-    genderSelect.addEventListener('change', renderVoices);
-
-    // Fetch and render voices
-    async function loadVoices() {
-      try {
-        const res = await fetch('/api/voices');
-        allVoices = await res.json();
-        totalVoiceCount.textContent = `${allVoices.length} Voices`;
-        if (allVoices.length > 0 && !allVoices.some(v => v.id === selectedVoiceId)) {
-          selectedVoiceId = allVoices[0].id;
-        }
-        updateFeaturedCount();
-        renderVoices();
-      } catch (err) {
-        console.error('Failed to load voices:', err);
-      }
-    }
-
-    const qualitySelect = document.getElementById('qualitySelect');
-    const qualityLabelBadge = document.getElementById('qualityLabelBadge');
 
     qualitySelect.addEventListener('change', () => {
       const val = qualitySelect.value;
@@ -1172,9 +1576,6 @@
         qualityLabelBadge.style.color = '#818cf8';
       }
     });
-
-    const moodSelect = document.getElementById('moodSelect');
-    const moodLabelBadge = document.getElementById('moodLabelBadge');
 
     moodSelect.addEventListener('change', () => {
       const val = moodSelect.value;
@@ -1208,48 +1609,291 @@
       pitchSlider.dispatchEvent(new Event('input'));
     });
 
+    function toggleStar(e, voiceId) {
+      e.stopPropagation();
+      if (starredVoiceIds.has(voiceId)) {
+        starredVoiceIds.delete(voiceId);
+      } else {
+        starredVoiceIds.add(voiceId);
+      }
+      localStorage.setItem('my_featured_voices', JSON.stringify([...starredVoiceIds]));
+      updateFeaturedCount();
+      renderVoices();
+    }
+
+    function updateFeaturedCount() {
+      const el = document.getElementById('featuredCount');
+      if (el) el.textContent = starredVoiceIds.size;
+    }
+
+    // Render Voices Grid
+    function renderVoices() {
+      voiceGrid.innerHTML = '';
+      let list = [];
+
+      if (currentVoiceTab === 'starred') {
+        list = allVoices.filter(v => starredVoiceIds.has(v.id));
+        voiceCountDisplay.textContent = `${list.length} starred voice${list.length === 1 ? '' : 's'}`;
+
+        if (list.length === 0) {
+          voiceGrid.innerHTML = `
+            <div style="grid-column: 1/-1; padding: 36px 20px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--card-border); border-radius: 14px;">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">⭐</div>
+              <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; color: var(--text);">No Starred Voices Yet</div>
+              <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 440px; margin: 0 auto 16px; line-height: 1.5;">
+                Click the small <strong>☆ Star</strong> on any voice to pin it into your favorites for fast access.
+              </p>
+              <button class="tab-btn" onclick="switchVoiceTab('main')" style="background: var(--accent); color: white;">Browse Voices</button>
+            </div>
+          `;
+          return;
+        }
+      } else if (currentEngine === 'elevenlabs') {
+        list = elevenlabsVoices;
+        voiceCountDisplay.textContent = `${list.length} ElevenLabs models`;
+      } else {
+        const query = searchInput.value.toLowerCase().trim();
+        const lang = langSelect.value;
+        const gender = genderSelect.value;
+
+        list = freeVoices.filter(v => {
+          if (gender !== 'ALL' && v.gender !== gender) return false;
+          if (lang !== 'ALL') {
+            if (lang.includes('-')) {
+              if (v.locale !== lang) return false;
+            } else {
+              if (!v.locale.startsWith(lang)) return false;
+            }
+          }
+          if (query) {
+            const matchName = v.name.toLowerCase().includes(query);
+            const matchLocale = (v.localeName || '').toLowerCase().includes(query);
+            const matchTag = (v.tag || '').toLowerCase().includes(query);
+            if (!matchName && !matchLocale && !matchTag) return false;
+          }
+          return true;
+        });
+
+        voiceCountDisplay.textContent = `${list.length} neural voice${list.length === 1 ? '' : 's'}`;
+
+        if (list.length === 0) {
+          voiceGrid.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; grid-column: 1/-1; padding: 20px; text-align: center;">No voices match your search query.</p>';
+          return;
+        }
+      }
+
+      list.forEach(voice => {
+        const isElevenLabs = voice.engine === 'elevenlabs';
+        const card = document.createElement('div');
+        card.className = `voice-card ${voice.id === selectedVoiceId ? 'active' : ''} ${isElevenLabs ? 'elevenlabs' : ''}`;
+
+        const isPlaying = voice.id === currentPlayingVoiceId;
+        const playIcon = isPlaying
+          ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+          : `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+
+        const isStarred = starredVoiceIds.has(voice.id);
+        const starIcon = isStarred ? '★' : '☆';
+
+        let badgeHtml = '';
+        if (isElevenLabs) {
+          badgeHtml = `<span class="badge-el">✨ ElevenLabs</span>`;
+        } else {
+          badgeHtml = `<span class="badge-locale">${voice.gender}, ${(voice.localeName || voice.locale || '').split(' (')[0]}</span>`;
+        }
+
+        card.innerHTML = `
+          <button class="btn-preview-play ${isPlaying ? 'playing' : ''}" data-voice-id="${voice.id}" title="${isPlaying ? 'Stop Preview' : 'Listen Real Sample Preview'}" onclick="togglePreview(event, '${voice.id}')">
+            ${playIcon}
+          </button>
+          <div class="voice-card-content">
+            <div class="voice-card-header">
+              <span class="voice-name">${voice.name}</span>
+              ${badgeHtml}
+            </div>
+            <div class="voice-desc" title="${voice.tag || voice.description || ''}">${voice.tag || voice.description || voice.localeName}</div>
+          </div>
+          <button class="btn-star ${isStarred ? 'starred' : ''}" data-voice-id="${voice.id}" title="${isStarred ? 'Remove from Starred' : 'Add to Starred'}" onclick="toggleStar(event, '${voice.id}')">
+            ${starIcon}
+          </button>
+        `;
+
+        card.onclick = () => {
+          document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          selectedVoiceId = voice.id;
+          localStorage.setItem('last_selected_voice', voice.id);
+        };
+
+        voiceGrid.appendChild(card);
+      });
+    }
+
+    // Voice Preview Playback
+    function togglePreview(e, voiceId) {
+      e.stopPropagation();
+
+      if (currentPlayingVoiceId === voiceId && currentPreviewAudio) {
+        currentPreviewAudio.pause();
+        currentPreviewAudio = null;
+        currentPlayingVoiceId = null;
+        updatePreviewButtons();
+        return;
+      }
+
+      if (currentPreviewAudio) {
+        currentPreviewAudio.pause();
+        currentPreviewAudio = null;
+      }
+
+      currentPlayingVoiceId = voiceId;
+      updatePreviewButtons();
+
+      const audio = new Audio(`/api/preview?voiceId=${encodeURIComponent(voiceId)}`);
+      currentPreviewAudio = audio;
+
+      audio.onplay = () => updatePreviewButtons();
+      audio.onended = () => {
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      };
+      audio.onerror = () => {
+        console.error('Failed to play preview for voice:', voiceId);
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      };
+
+      audio.play().catch(err => {
+        console.error('Play error:', err);
+        currentPlayingVoiceId = null;
+        currentPreviewAudio = null;
+        updatePreviewButtons();
+      });
+    }
+
+    function updatePreviewButtons() {
+      document.querySelectorAll('.btn-preview-play').forEach(btn => {
+        const vId = btn.getAttribute('data-voice-id');
+        if (vId === currentPlayingVoiceId) {
+          btn.classList.add('playing');
+          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+          btn.title = "Stop Preview";
+        } else {
+          btn.classList.remove('playing');
+          btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+          btn.title = "Listen Preview";
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', renderVoices);
+    langSelect.addEventListener('change', renderVoices);
+    genderSelect.addEventListener('change', renderVoices);
+
+    // Fetch and Load Voices
+    async function loadVoices() {
+      try {
+        const res = await fetch('/api/voices');
+        allVoices = await res.json();
+
+        elevenlabsVoices = allVoices.filter(v => v.engine === 'elevenlabs');
+        freeVoices = allVoices.filter(v => v.engine !== 'elevenlabs');
+
+        totalVoiceCount.textContent = `${elevenlabsVoices.length} ElevenLabs + ${freeVoices.length} Free`;
+
+        if (!allVoices.some(v => v.id === selectedVoiceId)) {
+          selectedVoiceId = currentEngine === 'elevenlabs' ? elevenlabsVoices[0]?.id : freeVoices[0]?.id;
+        }
+
+        updateFeaturedCount();
+        switchEngine(currentEngine);
+      } catch (err) {
+        console.error('Failed to load voices:', err);
+      }
+    }
+
     // Generate Audio
     async function generateAudio() {
       const text = promptText.value.trim();
       if (!text) {
-        alert('Please enter some text to generate audio.');
+        alert('Please enter some text or story to generate speech.');
+        return;
+      }
+
+      const activeVoice = allVoices.find(v => v.id === selectedVoiceId) || allVoices[0];
+      const isElevenLabs = currentEngine === 'elevenlabs' || activeVoice?.engine === 'elevenlabs';
+
+      let apiKey = getStoredApiKey();
+
+      if (isElevenLabs && !apiKey) {
+        openKeyModal();
         return;
       }
 
       generateBtn.disabled = true;
       spinner.style.display = 'inline-block';
-      btnText.textContent = 'Synthesizing Story & Audio...';
-
-      const rateNum = parseInt(rateSlider.value, 10);
-      const rateStr = rateNum === 0 ? 'default' : (rateNum > 0 ? `+${rateNum}%` : `${rateNum}%`);
-
-      const pitchNum = parseInt(pitchSlider.value, 10);
-      const pitchStr = pitchNum === 0 ? 'default' : (pitchNum > 0 ? `+${pitchNum}Hz` : `${pitchNum}Hz`);
+      btnText.textContent = isElevenLabs ? 'Synthesizing ElevenLabs Voice & Emotion...' : 'Synthesizing Neural Speech...';
 
       try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        let endpoint = '/api/generate';
+        let payload = {};
+
+        if (isElevenLabs) {
+          endpoint = '/api/elevenlabs/generate';
+          payload = {
+            text,
+            voiceId: selectedVoiceId,
+            apiKey,
+            modelId: elModelSelect.value,
+            stability: parseFloat(stabilitySlider.value) / 100,
+            similarityBoost: parseFloat(similaritySlider.value) / 100,
+            style: parseFloat(styleSlider.value) / 100,
+            speakerBoost: speakerBoostCheck.checked
+          };
+        } else {
+          const rateNum = parseInt(rateSlider.value, 10);
+          const rateStr = rateNum === 0 ? 'default' : (rateNum > 0 ? `+${rateNum}%` : `${rateNum}%`);
+          const pitchNum = parseInt(pitchSlider.value, 10);
+          const pitchStr = pitchNum === 0 ? 'default' : (pitchNum > 0 ? `+${pitchNum}Hz` : `${pitchNum}Hz`);
+
+          payload = {
             text,
             voiceId: selectedVoiceId,
             rate: rateStr,
             pitch: pitchStr,
             quality: qualitySelect.value,
-            mood: moodSelect.value
-          })
+            mood: moodSelect.value,
+            engine: 'free'
+          };
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-elevenlabs-key': apiKey
+          },
+          body: JSON.stringify(payload)
         });
 
         const data = await res.json();
+
+        if (data.needsApiKey) {
+          openKeyModal();
+          throw new Error(data.error);
+        }
+
         if (!res.ok || !data.success) {
-          throw new Error(data.error || 'Failed to synthesize audio');
+          throw new Error(data.error || 'Failed to synthesize speech');
         }
 
         const audio = data.audio;
         playerSection.style.display = 'block';
         audioPlayer.src = audio.url;
         audioPlayer.play().catch(() => {});
-        playerInfo.innerHTML = `<strong>${audio.voiceName}</strong> <span class="badge-quality">${audio.mood || 'Suspense'}</span> <span class="badge-quality">${audio.quality || 'MP3'}</span> (${audio.sizeKb} KB)`;
+        playerInfo.innerHTML = `<strong>${audio.voiceName}</strong> <span class="badge-quality">${audio.mood || 'Natural'}</span> <span class="badge-quality">${audio.quality || 'MP3'}</span> (${audio.sizeKb} KB)`;
         downloadBtn.href = audio.downloadUrl;
         downloadBtn.download = audio.filename;
         if (editAudioBtn) {
@@ -1262,7 +1906,7 @@
       } finally {
         generateBtn.disabled = false;
         spinner.style.display = 'none';
-        btnText.textContent = 'Generate Audio';
+        btnText.textContent = isElevenLabs ? '✨ Generate ElevenLabs Speech' : '🌐 Generate Free Audio';
       }
     }
 
@@ -1273,6 +1917,7 @@
       }
     });
 
+    // History Playback & Operations
     function playHistoryItem(url, voiceName, mood, quality, sizeKb, downloadUrl, filename) {
       playerSection.style.display = 'block';
       audioPlayer.src = decodeURIComponent(url);
@@ -1322,7 +1967,6 @@
       const bulkCb = document.getElementById('bulkSelectAll');
 
       if (selectedCount) selectedCount.textContent = count;
-
       if (count > 0) {
         bulkBar.style.display = 'flex';
       } else {
@@ -1402,7 +2046,6 @@
       });
     }
 
-    // Load History
     async function loadHistory() {
       try {
         const res = await fetch('/api/history');
@@ -1430,7 +2073,7 @@
         history.forEach(item => {
           const div = document.createElement('div');
           div.className = 'history-item';
-          const qualityText = item.quality || 'High (96k)';
+          const qualityText = item.quality || 'MP3';
           const moodText = item.mood || '';
           const moodBadge = moodText ? `<span class="badge-quality" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.3);">${moodText}</span>` : '';
           const encodedUrl = encodeURIComponent(item.url);
@@ -1471,9 +2114,10 @@
 
     document.getElementById('refreshHistory').addEventListener('click', loadHistory);
 
-    // Initial load
+    // Initial Load
     loadVoices();
     loadHistory();
+    updateApiKeyUI();
   </script>
 </body>
 </html>
