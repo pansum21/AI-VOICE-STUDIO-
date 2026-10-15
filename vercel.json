@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/audio/(.*)", "destination": "/api/index.js" },
+    { "source": "/download/(.*)", "destination": "/api/index.js" },
+    { "source": "/editor", "destination": "/editor.html" }
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "all_voices.json,voices.js,public/**,*.html",
+      "maxDuration": 60
+    }
+  }
+}

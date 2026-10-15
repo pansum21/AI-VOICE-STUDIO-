@@ -9,15 +9,42 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
-const OUTPUT_DIR = path.join(__dirname, 'generated_audio');
-const PREVIEW_DIR = path.join(__dirname, 'preview_cache');
+const isVercel = !!(process.env.VERCEL || process.env.VERCEL_ENV || process.env.NOW_REGION);
+const OUTPUT_DIR = isVercel ? path.join('/tmp', 'generated_audio') : path.join(__dirname, 'generated_audio');
+const PREVIEW_DIR = isVercel ? path.join('/tmp', 'preview_cache') : path.join(__dirname, 'preview_cache');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-if (!fs.existsSync(OUTPUT_DIR)) {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(PREVIEW_DIR)) {
+    fs.mkdirSync(PREVIEW_DIR, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Directory init warning:', e.message);
 }
-if (!fs.existsSync(PREVIEW_DIR)) {
-  fs.mkdirSync(PREVIEW_DIR, { recursive: true });
+
+// Safely parse request body across standalone Node.js and Vercel serverless runtimes
+async function parseBody(req) {
+  if (req.body !== undefined && req.body !== null) {
+    if (typeof req.body === 'object') return req.body;
+    if (typeof req.body === 'string') {
+      try { return JSON.parse(req.body); } catch (_) { return {}; }
+    }
+  }
+  return new Promise((resolve) => {
+    let raw = '';
+    req.on('data', chunk => { raw += chunk; });
+    req.on('end', () => {
+      try {
+        resolve(JSON.parse(raw || '{}'));
+      } catch (_) {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
 }
 
 // Helper to sanitize filenames
@@ -473,8 +500,9 @@ async function synthesizeElevenLabs({
   return finalBuffer.length;
 }
 
-const server = http.createServer(async (req, res) => {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+export async function handleRequest(req, res) {
+  const host = req.headers.host || 'localhost';
+  const parsedUrl = new URL(req.url, `http://${host}`);
   const pathname = parsedUrl.pathname;
 
   // CORS Headers (allow custom ElevenLabs headers)
@@ -537,17 +565,11 @@ const server = http.createServer(async (req, res) => {
     };
 
     if (req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => { body += chunk; });
-      req.on('end', () => {
-        try {
-          const parsed = JSON.parse(body || '{}');
-          key = parsed.apiKey || key;
-        } catch (_) {}
-        handleVerify(key);
-      });
+      const parsed = await parseBody(req);
+      key = parsed.apiKey || key;
+      await handleVerify(key);
     } else {
-      handleVerify(key);
+      await handleVerify(key);
     }
     return;
   }
@@ -625,113 +647,106 @@ const server = http.createServer(async (req, res) => {
 
   // 1.9 API: Dedicated ElevenLabs Generate Endpoint (/api/elevenlabs/generate)
   if (pathname === '/api/elevenlabs/generate' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
-        const {
-          text,
-          voiceId = 'pNInz6obpgDQGcFmaJgB', // Adam by default
-          modelId = 'eleven_multilingual_v2',
-          stability = 0.40,
-          similarityBoost = 0.85,
-          style = 0.35,
-          speakerBoost = true
-        } = parsed;
+    try {
+      const parsed = await parseBody(req);
+      const {
+        text,
+        voiceId = 'pNInz6obpgDQGcFmaJgB', // Adam by default
+        modelId = 'eleven_multilingual_v2',
+        stability = 0.40,
+        similarityBoost = 0.85,
+        style = 0.35,
+        speakerBoost = true
+      } = parsed;
 
-        const apiKey = parsed.apiKey || req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || process.env.ELEVENLABS_API_KEY;
+      const apiKey = parsed.apiKey || req.headers['x-elevenlabs-key'] || req.headers['xi-api-key'] || process.env.ELEVENLABS_API_KEY;
 
-        if (!apiKey) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
-            success: false,
-            needsApiKey: true,
-            error: 'ElevenLabs API Key required. Please enter your API key to generate using authentic ElevenLabs voice models, or switch to the Free Engine.'
-          }));
-          return;
-        }
-
-        if (!text || !text.trim()) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Text prompt is required.' }));
-          return;
-        }
-
-        const cleanedText = cleanScript(text);
-        if (!cleanedText) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Script is empty after cleaning.' }));
-          return;
-        }
-
-        const elVoice = ELEVENLABS_VOICES.find(v => v.id === voiceId || v.voiceId === voiceId) || {
-          id: voiceId,
-          name: 'ElevenLabs Voice',
-          gender: 'Neutral'
-        };
-
-        const timestamp = Date.now();
-        const snippet = sanitize(cleanedText.replace(/\s+/g, '_'));
-        const filename = `${timestamp}_ElevenLabs_${elVoice.name.replace(/[^a-zA-Z0-9]/g, '_')}_${snippet}.mp3`;
-        const filePath = path.join(OUTPUT_DIR, filename);
-
-        await synthesizeElevenLabs({
-          text: cleanedText,
-          voiceId: elVoice.id,
-          modelId,
-          stability,
-          similarityBoost,
-          style,
-          speakerBoost,
-          apiKey,
-          outputPath: filePath
-        });
-
-        const stats = fs.statSync(filePath);
-        const metadata = {
-          filename,
-          url: `/audio/${encodeURIComponent(filename)}`,
-          downloadUrl: `/download/${encodeURIComponent(filename)}`,
-          sizeBytes: stats.size,
-          sizeKb: (stats.size / 1024).toFixed(1),
-          voiceName: `${elVoice.name} (ElevenLabs)`,
-          voiceId: elVoice.id,
-          engine: 'elevenlabs',
-          quality: 'Studio MP3 (44.1kHz)',
-          mood: `ElevenLabs ${modelId.includes('multilingual') ? 'Multilingual v2' : 'Turbo v2.5'} (Emotion/Style: ${Math.round(style * 100)}%, Stab: ${Math.round(stability * 100)}%)`,
-          text: cleanedText,
-          createdAt: new Date().toISOString()
-        };
-
-        const historyFile = path.join(OUTPUT_DIR, 'history.json');
-        let history = [];
-        if (fs.existsSync(historyFile)) {
-          try {
-            history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
-          } catch (_) {}
-        }
-        history.unshift(metadata);
-        fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, audio: metadata }));
-      } catch (err) {
-        console.error('ElevenLabs generation error:', err);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, error: err.message }));
+      if (!apiKey) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          needsApiKey: true,
+          error: 'ElevenLabs API Key required. Please enter your API key to generate using authentic ElevenLabs voice models, or switch to the Free Engine.'
+        }));
+        return;
       }
-    });
+
+      if (!text || !text.trim()) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Text prompt is required.' }));
+        return;
+      }
+
+      const cleanedText = cleanScript(text);
+      if (!cleanedText) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Script is empty after cleaning.' }));
+        return;
+      }
+
+      const elVoice = ELEVENLABS_VOICES.find(v => v.id === voiceId || v.voiceId === voiceId) || {
+        id: voiceId,
+        name: 'ElevenLabs Voice',
+        gender: 'Neutral'
+      };
+
+      const timestamp = Date.now();
+      const snippet = sanitize(cleanedText.replace(/\s+/g, '_'));
+      const filename = `${timestamp}_ElevenLabs_${elVoice.name.replace(/[^a-zA-Z0-9]/g, '_')}_${snippet}.mp3`;
+      const filePath = path.join(OUTPUT_DIR, filename);
+
+      await synthesizeElevenLabs({
+        text: cleanedText,
+        voiceId: elVoice.id,
+        modelId,
+        stability,
+        similarityBoost,
+        style,
+        speakerBoost,
+        apiKey,
+        outputPath: filePath
+      });
+
+      const stats = fs.statSync(filePath);
+      const metadata = {
+        filename,
+        url: `/audio/${encodeURIComponent(filename)}`,
+        downloadUrl: `/download/${encodeURIComponent(filename)}`,
+        sizeBytes: stats.size,
+        sizeKb: (stats.size / 1024).toFixed(1),
+        voiceName: `${elVoice.name} (ElevenLabs)`,
+        voiceId: elVoice.id,
+        engine: 'elevenlabs',
+        quality: 'Studio MP3 (44.1kHz)',
+        mood: `ElevenLabs ${modelId.includes('multilingual') ? 'Multilingual v2' : 'Turbo v2.5'} (Emotion/Style: ${Math.round(style * 100)}%, Stab: ${Math.round(stability * 100)}%)`,
+        text: cleanedText,
+        createdAt: new Date().toISOString()
+      };
+
+      const historyFile = path.join(OUTPUT_DIR, 'history.json');
+      let history = [];
+      if (fs.existsSync(historyFile)) {
+        try {
+          history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
+        } catch (_) {}
+      }
+      history.unshift(metadata);
+      fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, audio: metadata }));
+    } catch (err) {
+      console.error('ElevenLabs generation error:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: err.message }));
+    }
     return;
   }
 
   // 2. API: Generate Audio (Dual Engine: ElevenLabs or Free Neural)
   if (pathname === '/api/generate' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
+    try {
+      const parsed = await parseBody(req);
         const {
           text,
           voiceId,
@@ -974,111 +989,104 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
       }
-    });
-    return;
-  }
+      return;
+    }
 
   // 2.5 API: Delete Audio Files (Single or Batch)
   if (pathname === '/api/delete' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const { filenames = [] } = JSON.parse(body || '{}');
-        const historyFile = path.join(OUTPUT_DIR, 'history.json');
-        let history = [];
-        if (fs.existsSync(historyFile)) {
+    try {
+      const parsed = await parseBody(req);
+      const { filenames = [] } = parsed;
+      const historyFile = path.join(OUTPUT_DIR, 'history.json');
+      let history = [];
+      if (fs.existsSync(historyFile)) {
+        try {
+          history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
+        } catch (_) {}
+      }
+
+      const deleted = [];
+      const deleteSet = new Set(filenames);
+
+      for (const fname of filenames) {
+        const safeName = path.basename(fname);
+        const filePath = path.join(OUTPUT_DIR, safeName);
+        if (fs.existsSync(filePath)) {
           try {
-            history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
-          } catch (_) {}
-        }
-
-        const deleted = [];
-        const deleteSet = new Set(filenames);
-
-        for (const fname of filenames) {
-          const safeName = path.basename(fname);
-          const filePath = path.join(OUTPUT_DIR, safeName);
-          if (fs.existsSync(filePath)) {
-            try {
-              fs.unlinkSync(filePath);
-              deleted.push(safeName);
-            } catch (e) {
-              console.error('Error deleting file:', e.message);
-            }
+            fs.unlinkSync(filePath);
+            deleted.push(safeName);
+          } catch (e) {
+            console.error('Error deleting file:', e.message);
           }
         }
-
-        // Update history.json
-        history = history.filter(item => !deleteSet.has(item.filename));
-        fs.writeFileSync(historyFile, JSON.stringify(history, null, 2), 'utf-8');
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, deleted }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
       }
-    });
+
+      // Update history.json
+      history = history.filter(item => !deleteSet.has(item.filename));
+      fs.writeFileSync(historyFile, JSON.stringify(history, null, 2), 'utf-8');
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, deleted }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
     return;
   }
 
   // 2.8 API: Save Edited Audio
   if (pathname === '/api/save-edited' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const { originalFilename, audioBase64, format = 'wav', editLabel = 'Edited', text = '', voiceName = 'Studio Voice' } = JSON.parse(body || '{}');
+    try {
+      const parsed = await parseBody(req);
+      const { originalFilename, audioBase64, format = 'wav', editLabel = 'Edited', text = '', voiceName = 'Studio Voice' } = parsed;
 
-        if (!audioBase64) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Audio data is required' }));
-          return;
-        }
-
-        const buffer = Buffer.from(audioBase64, 'base64');
-        const timestamp = Date.now();
-        const base = sanitize(path.basename(originalFilename || 'audio', path.extname(originalFilename || 'audio')));
-        const allowedFormats = ['wav', 'mp3', 'webm', 'ogg'];
-        const safeFormat = allowedFormats.includes(String(format).toLowerCase()) ? String(format).toLowerCase() : 'wav';
-        const filename = `${timestamp}_edited_${base}.${safeFormat}`;
-        const filePath = path.join(OUTPUT_DIR, filename);
-
-        fs.writeFileSync(filePath, buffer);
-
-        const stats = fs.statSync(filePath);
-        const metadata = {
-          filename,
-          url: `/audio/${encodeURIComponent(filename)}`,
-          downloadUrl: `/download/${encodeURIComponent(filename)}`,
-          sizeBytes: stats.size,
-          sizeKb: (stats.size / 1024).toFixed(1),
-          voiceName: `${voiceName} (Edited)`,
-          quality: safeFormat.toUpperCase(),
-          mood: editLabel || '✂️ Custom Edit',
-          text: text || `[Edited version of ${originalFilename}]`,
-          createdAt: new Date().toISOString()
-        };
-
-        const historyFile = path.join(OUTPUT_DIR, 'history.json');
-        let history = [];
-        if (fs.existsSync(historyFile)) {
-          try {
-            history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
-          } catch (_) {}
-        }
-        history.unshift(metadata);
-        fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, audio: metadata }));
-      } catch (err) {
-        console.error('Error saving edited audio:', err);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
+      if (!audioBase64) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Audio data is required' }));
+        return;
       }
-    });
+
+      const buffer = Buffer.from(audioBase64, 'base64');
+      const timestamp = Date.now();
+      const base = sanitize(path.basename(originalFilename || 'audio', path.extname(originalFilename || 'audio')));
+      const allowedFormats = ['wav', 'mp3', 'webm', 'ogg'];
+      const safeFormat = allowedFormats.includes(String(format).toLowerCase()) ? String(format).toLowerCase() : 'wav';
+      const filename = `${timestamp}_edited_${base}.${safeFormat}`;
+      const filePath = path.join(OUTPUT_DIR, filename);
+
+      fs.writeFileSync(filePath, buffer);
+
+      const stats = fs.statSync(filePath);
+      const metadata = {
+        filename,
+        url: `/audio/${encodeURIComponent(filename)}`,
+        downloadUrl: `/download/${encodeURIComponent(filename)}`,
+        sizeBytes: stats.size,
+        sizeKb: (stats.size / 1024).toFixed(1),
+        voiceName: `${voiceName} (Edited)`,
+        quality: safeFormat.toUpperCase(),
+        mood: editLabel || '✂️ Custom Edit',
+        text: text || `[Edited version of ${originalFilename}]`,
+        createdAt: new Date().toISOString()
+      };
+
+      const historyFile = path.join(OUTPUT_DIR, 'history.json');
+      let history = [];
+      if (fs.existsSync(historyFile)) {
+        try {
+          history = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
+        } catch (_) {}
+      }
+      history.unshift(metadata);
+      fs.writeFileSync(historyFile, JSON.stringify(history.slice(0, 100), null, 2), 'utf-8');
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, audio: metadata }));
+    } catch (err) {
+      console.error('Error saving edited audio:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
     return;
   }
 
@@ -1135,8 +1143,13 @@ const server = http.createServer(async (req, res) => {
 
   // 6. Static files
   if (pathname === '/editor' || pathname === '/editor.html') {
-    const editorPath = path.join(PUBLIC_DIR, 'editor.html');
-    if (fs.existsSync(editorPath)) {
+    const editorCandidates = [
+      path.join(PUBLIC_DIR, 'editor.html'),
+      path.join(__dirname, 'editor.html'),
+      path.join(__dirname, 'public', 'editor.html')
+    ];
+    const editorPath = editorCandidates.find(p => fs.existsSync(p));
+    if (editorPath) {
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
@@ -1148,8 +1161,14 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+  const cleanPath = pathname === '/' ? 'index.html' : pathname.replace(/^\//, '');
+  const candidatePaths = [
+    path.join(PUBLIC_DIR, cleanPath),
+    path.join(__dirname, cleanPath),
+    path.join(__dirname, 'public', cleanPath)
+  ];
+  const filePath = candidatePaths.find(p => fs.existsSync(p) && fs.statSync(p).isFile());
+  if (filePath) {
     const ext = path.extname(filePath);
     const mimeTypes = {
       '.html': 'text/html; charset=utf-8',
@@ -1157,81 +1176,104 @@ const server = http.createServer(async (req, res) => {
       '.js': 'text/javascript',
       '.json': 'application/json',
       '.png': 'image/png',
-      '.svg': 'image/svg+xml'
+      '.svg': 'image/svg+xml',
+      '.ico': 'image/x-icon',
+      '.wav': 'audio/wav',
+      '.mp3': 'audio/mpeg'
     };
     res.writeHead(200, {
-      'Content-Type': mimeTypes[ext] || 'text/plain',
+      'Content-Type': mimeTypes[ext] || 'application/octet-stream',
       'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       'Pragma': 'no-cache',
       'Expires': '0'
     });
     fs.createReadStream(filePath).pipe(res);
+    return;
+  }
+
+  // Default SPA fallback
+  const indexCandidates = [
+    path.join(PUBLIC_DIR, 'index.html'),
+    path.join(__dirname, 'index.html'),
+    path.join(__dirname, 'public', 'index.html')
+  ];
+  const indexPath = indexCandidates.find(p => fs.existsSync(p));
+  if (indexPath && !pathname.startsWith('/api/')) {
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    fs.createReadStream(indexPath).pipe(res);
   } else {
-    // Default to index.html for SPA
-    const indexPath = path.join(PUBLIC_DIR, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      });
-      fs.createReadStream(indexPath).pipe(res);
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Endpoint not found', path: pathname }));
+  }
+}
+
+export default handleRequest;
+
+if (!isVercel) {
+  const server = http.createServer((req, res) => {
+    handleRequest(req, res).catch(err => {
+      console.error('Unhandled request error:', err);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal server error' }));
+      }
+    });
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is in use. Trying fallback port ${Number(PORT) + 1}...`);
+      server.listen(Number(PORT) + 1);
     } else {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('Not found');
+      console.error('Server error:', err);
     }
-  }
-});
+  });
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is in use. Trying fallback port ${Number(PORT) + 1}...`);
-    server.listen(Number(PORT) + 1);
-  } else {
-    console.error('Server error:', err);
-  }
-});
+  server.listen(PORT, () => {
+    console.log(`\n======================================================`);
+    console.log(`  FREE AI VOICE STUDIO IS RUNNING!`);
+    console.log(`  Web Studio: http://localhost:${PORT}`);
+    console.log(`  Audio Directory: ${OUTPUT_DIR}`);
+    console.log(`======================================================\n`);
 
-server.listen(PORT, () => {
-  console.log(`\n======================================================`);
-  console.log(`  FREE AI VOICE STUDIO IS RUNNING!`);
-  console.log(`  Web Studio: http://localhost:${PORT}`);
-  console.log(`  Audio Directory: ${OUTPUT_DIR}`);
-  console.log(`======================================================\n`);
+    // Pre-cache preview audio for ElevenLabs and featured voices in background
+    (async () => {
+      for (const elv of ELEVENLABS_VOICES.slice(0, 12)) {
+        const previewFile = path.join(PREVIEW_DIR, `el_${sanitize(elv.id)}.mp3`);
+        if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {
+          if (elv.previewUrl) {
+            try {
+              const resp = await fetch(elv.previewUrl);
+              if (resp.ok) {
+                const buf = Buffer.from(await resp.arrayBuffer());
+                fs.writeFileSync(previewFile, buf);
+              }
+            } catch (_) {}
+          }
+        }
+      }
+      console.log(`[Preview Cache] Authentic ElevenLabs voice previews ready.`);
 
-  // Pre-cache preview audio for ElevenLabs and featured voices in background
-  (async () => {
-    for (const elv of ELEVENLABS_VOICES.slice(0, 12)) {
-      const previewFile = path.join(PREVIEW_DIR, `el_${sanitize(elv.id)}.mp3`);
-      if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {
-        if (elv.previewUrl) {
+      for (const fv of FEATURED_VOICES) {
+        const previewFile = path.join(PREVIEW_DIR, `${sanitize(fv.id)}.mp3`);
+        if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {
           try {
-            const resp = await fetch(elv.previewUrl);
-            if (resp.ok) {
-              const buf = Buffer.from(await resp.arrayBuffer());
-              fs.writeFileSync(previewFile, buf);
-            }
+            const text = getPreviewText(fv);
+            const tts = new EdgeTTS({
+              voice: fv.id,
+              lang: fv.locale || 'en-US',
+              outputFormat: 'audio-24khz-96kbitrate-mono-mp3'
+            });
+            await tts.ttsPromise(text, previewFile);
           } catch (_) {}
         }
       }
-    }
-    console.log(`[Preview Cache] Authentic ElevenLabs voice previews ready.`);
-
-    for (const fv of FEATURED_VOICES) {
-      const previewFile = path.join(PREVIEW_DIR, `${sanitize(fv.id)}.mp3`);
-      if (!fs.existsSync(previewFile) || fs.statSync(previewFile).size === 0) {
-        try {
-          const text = getPreviewText(fv);
-          const tts = new EdgeTTS({
-            voice: fv.id,
-            lang: fv.locale || 'en-US',
-            outputFormat: 'audio-24khz-96kbitrate-mono-mp3'
-          });
-          await tts.ttsPromise(text, previewFile);
-        } catch (_) {}
-      }
-    }
-    console.log(`[Preview Cache] Top featured voice previews ready.`);
-  })();
-});
+      console.log(`[Preview Cache] Top featured voice previews ready.`);
+    })();
+  });
+}
