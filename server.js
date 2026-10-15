@@ -1214,7 +1214,9 @@ export async function handleRequest(req, res) {
 
 export default handleRequest;
 
-if (!isVercel) {
+const isDirectRun = !isVercel && process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+
+if (isDirectRun) {
   const server = http.createServer((req, res) => {
     handleRequest(req, res).catch(err => {
       console.error('Unhandled request error:', err);
