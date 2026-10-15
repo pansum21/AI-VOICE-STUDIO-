@@ -9,15 +9,18 @@
   <title>AI Voice Studio Pro - ElevenLabs Official & Free Neural Engine</title>
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(22, 28, 45, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
-      --accent-glow: rgba(99, 102, 241, 0.25);
-      --text: #f3f4f6;
-      --text-muted: #9ca3af;
-      --tag-bg: rgba(99, 102, 241, 0.15);
+      --bg: #060813;
+      --card-bg: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-border-hover: rgba(255, 255, 255, 0.18);
+      --glass-glow: rgba(99, 102, 241, 0.15);
+      --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-glow: rgba(79, 70, 229, 0.35);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --tag-bg: rgba(99, 102, 241, 0.12);
       --tag-border: rgba(99, 102, 241, 0.3);
       --success: #10b981;
       --warning: #f59e0b;
@@ -39,8 +42,10 @@
       display: flex;
       flex-direction: column;
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+        radial-gradient(circle at 12% 16%, rgba(99, 102, 241, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 88% 22%, rgba(236, 72, 153, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 50%);
+      background-attachment: fixed;
     }
 
     header {
@@ -49,9 +54,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      backdrop-filter: blur(10px);
+      background: rgba(11, 15, 25, 0.75);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       flex-wrap: wrap;
       gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
     .brand {
@@ -63,12 +73,12 @@
     .brand-icon {
       width: 38px;
       height: 38px;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
+      background: #4f46e5;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px var(--accent-glow);
+      box-shadow: 0 4px 14px var(--accent-glow);
     }
 
     .brand h1 {
@@ -93,15 +103,20 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.8rem;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
       border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       color: var(--text);
+    }
+
+    .btn-key-status:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--card-border-hover);
     }
 
     .btn-key-status.connected {
@@ -124,10 +139,10 @@
     }
 
     .badge-count {
-      background: rgba(99, 102, 241, 0.2);
-      color: #a5b4fc;
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      padding: 4px 12px;
+      background: rgba(99, 102, 241, 0.16);
+      color: #c7d2fe;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 5px 14px;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 600;
@@ -153,9 +168,11 @@
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 20px;
-      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      box-shadow: var(--glass-shadow);
     }
 
     .card-title {
@@ -171,8 +188,8 @@
     .engine-bar {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
     @media (max-width: 600px) {
@@ -184,31 +201,32 @@
     .engine-tab {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      padding: 13px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
       cursor: pointer;
       text-align: left;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
       color: var(--text-muted);
     }
 
     .engine-tab:hover {
       background: rgba(255, 255, 255, 0.06);
-      transform: translateY(-1px);
+      border-color: var(--card-border-hover);
+      color: var(--text);
     }
 
     .engine-tab.active {
-      background: rgba(99, 102, 241, 0.16);
-      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.14);
+      border-color: #6366f1;
       color: var(--text);
-      box-shadow: 0 0 16px var(--accent-glow);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
     }
 
     .engine-icon {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       line-height: 1;
     }
 
@@ -590,69 +608,81 @@
 
     .pill-btn {
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.76rem;
-      color: var(--text);
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #cbd5e1;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
     .pill-btn:hover {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: rgba(99, 102, 241, 0.4);
-      color: #a5b4fc;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
     }
 
     .pill-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
+      background: #4f46e5;
+      border-color: #6366f1;
+      color: #ffffff;
     }
 
-    /* Action Buttons */
+    /* Action Buttons (Very Simple & Modern) */
     .actions {
       display: flex;
       gap: 12px;
       align-items: center;
+      margin-top: 14px;
     }
 
     .btn-generate {
       flex: 1;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: white;
-      border: none;
+      background: #4f46e5;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
-      padding: 14px 20px;
-      font-size: 1rem;
+      padding: 13px 24px;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: background 0.15s ease, transform 0.15s ease;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
     }
 
     .btn-generate:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px var(--accent-glow);
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+    }
+
+    .btn-generate:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     .btn-generate:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     /* Active Player Area */
     .player-section {
-      margin-top: 18px;
-      padding: 16px;
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: 12px;
+      margin-top: 20px;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       display: none;
     }
 
@@ -676,27 +706,30 @@
     audio {
       width: 100%;
       height: 38px;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
     }
 
     .btn-download {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 500;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.2s;
+      transition: all 0.15s ease;
     }
 
     .btn-download:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
     }
 
     /* History Sidebar & Bulk Action Bar */
@@ -1823,22 +1856,22 @@
       if (val === 'suspense') {
         moodLabelBadge.textContent = '🎭 Suspense';
         moodLabelBadge.style.color = '#818cf8';
-        rateSlider.value = -4;
+        rateSlider.value = 0;
         pitchSlider.value = 0;
       } else if (val === 'horror') {
         moodLabelBadge.textContent = '🌑 Mystery';
         moodLabelBadge.style.color = '#f87171';
-        rateSlider.value = -7;
+        rateSlider.value = 0;
         pitchSlider.value = 0;
       } else if (val === 'story') {
         moodLabelBadge.textContent = '📖 Story';
         moodLabelBadge.style.color = '#60a5fa';
-        rateSlider.value = -2;
+        rateSlider.value = 1;
         pitchSlider.value = 0;
       } else if (val === 'fast') {
         moodLabelBadge.textContent = '⚡ Thriller';
         moodLabelBadge.style.color = '#f59e0b';
-        rateSlider.value = 8;
+        rateSlider.value = 10;
         pitchSlider.value = 0;
       } else {
         moodLabelBadge.textContent = '🎙️ Pure Studio';
@@ -2094,14 +2127,9 @@
 
       let apiKey = getStoredApiKey();
 
-      if (isElevenLabs && !apiKey) {
-        openKeyModal();
-        return;
-      }
-
       generateBtn.disabled = true;
       spinner.style.display = 'inline-block';
-      btnText.textContent = isElevenLabs ? 'Synthesizing ElevenLabs Voice & Emotion...' : 'Synthesizing Neural Speech...';
+      btnText.textContent = isElevenLabs ? 'Synthesizing ElevenLabs Voice & Emotion...' : 'Synthesizing Studio Speech...';
 
       try {
         let endpoint = '/api/generate';
@@ -2146,11 +2174,6 @@
         });
 
         const data = await res.json();
-
-        if (data.needsApiKey) {
-          openKeyModal();
-          throw new Error(data.error);
-        }
 
         if (!res.ok || !data.success) {
           throw new Error(data.error || 'Failed to synthesize speech');

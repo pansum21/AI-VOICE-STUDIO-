@@ -10,6 +10,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'pNInz6obpgDQGcFmaJgB',
     voiceId: 'pNInz6obpgDQGcFmaJgB',
+    underlyingVoice: 'en-US-BrianMultilingualNeural',
     name: 'Adam',
     gender: 'Male',
     lang: 'English / Multilingual (29 Languages)',
@@ -25,6 +26,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'onwK4e9ZLuTAKqWW03F9',
     voiceId: 'onwK4e9ZLuTAKqWW03F9',
+    underlyingVoice: 'en-GB-RyanNeural',
     name: 'Daniel',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -40,6 +42,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'nPczCjzI2devNBz1zQrb',
     voiceId: 'nPczCjzI2devNBz1zQrb',
+    underlyingVoice: 'en-US-BrianMultilingualNeural',
     name: 'Brian',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -55,6 +58,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'JBFqnCBsd6RMkjVDRZzb',
     voiceId: 'JBFqnCBsd6RMkjVDRZzb',
+    underlyingVoice: 'en-GB-ThomasNeural',
     name: 'George',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -70,6 +74,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'N2lVS1w4EtoT3dr4eOWO',
     voiceId: 'N2lVS1w4EtoT3dr4eOWO',
+    underlyingVoice: 'en-US-ChristopherNeural',
     name: 'Callum',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -85,6 +90,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'IKne3meq5aSn9XLyUdCD',
     voiceId: 'IKne3meq5aSn9XLyUdCD',
+    underlyingVoice: 'en-AU-WilliamNeural',
     name: 'Charlie',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -100,6 +106,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'pFZP5JQG7iQjIQuC4Bku',
     voiceId: 'pFZP5JQG7iQjIQuC4Bku',
+    underlyingVoice: 'en-GB-SoniaNeural',
     name: 'Lily',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -115,6 +122,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: '21m00Tcm4TlvDq8ikWAM',
     voiceId: '21m00Tcm4TlvDq8ikWAM',
+    underlyingVoice: 'en-US-AvaMultilingualNeural',
     name: 'Rachel',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -130,6 +138,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'XB0fDUnXU5ikFXrFcAZo',
     voiceId: 'XB0fDUnXU5ikFXrFcAZo',
+    underlyingVoice: 'en-US-JennyMultilingualNeural',
     name: 'Charlotte',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -145,6 +154,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'Xb7hH8MSUJpSbSDYk0k2',
     voiceId: 'Xb7hH8MSUJpSbSDYk0k2',
+    underlyingVoice: 'en-GB-LibbyNeural',
     name: 'Alice',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -160,6 +170,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'TX3LPaxmHKxFdv7VOQHJ',
     voiceId: 'TX3LPaxmHKxFdv7VOQHJ',
+    underlyingVoice: 'en-US-AndrewMultilingualNeural',
     name: 'Liam',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -175,6 +186,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'ErXwobaYiN019PkySvjV',
     voiceId: 'ErXwobaYiN019PkySvjV',
+    underlyingVoice: 'en-US-AndrewMultilingualNeural',
     name: 'Antoni',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -190,6 +202,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'EXAVITQu4vr4xnSDxMaL',
     voiceId: 'EXAVITQu4vr4xnSDxMaL',
+    underlyingVoice: 'en-US-EmmaMultilingualNeural',
     name: 'Sarah',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -205,6 +218,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'pqHfZKP75CvOlQylNhV4',
     voiceId: 'pqHfZKP75CvOlQylNhV4',
+    underlyingVoice: 'en-US-GuyNeural',
     name: 'Bill',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -220,6 +234,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'CwhRBWXzGAHq8TQ4Fs17',
     voiceId: 'CwhRBWXzGAHq8TQ4Fs17',
+    underlyingVoice: 'en-US-EricNeural',
     name: 'Roger',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -235,6 +250,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'FGY2WhTYpPnrIDTdsKH5',
     voiceId: 'FGY2WhTYpPnrIDTdsKH5',
+    underlyingVoice: 'en-US-AvaMultilingualNeural',
     name: 'Laura',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -250,6 +266,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'SAz9YHcvj6GT2YYXdXww',
     voiceId: 'SAz9YHcvj6GT2YYXdXww',
+    underlyingVoice: 'en-US-AvaMultilingualNeural',
     name: 'River',
     gender: 'Non-binary / Neutral',
     lang: 'English / Multilingual',
@@ -265,6 +282,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'SOYHLrjzK2X1ezoPC6cr',
     voiceId: 'SOYHLrjzK2X1ezoPC6cr',
+    underlyingVoice: 'en-US-ChristopherNeural',
     name: 'Harry',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -280,6 +298,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'XrExE9yKIg1WjnnlVkGX',
     voiceId: 'XrExE9yKIg1WjnnlVkGX',
+    underlyingVoice: 'en-US-EmmaMultilingualNeural',
     name: 'Matilda',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -295,6 +314,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'bIHbv24MWmeRgasZH58o',
     voiceId: 'bIHbv24MWmeRgasZH58o',
+    underlyingVoice: 'en-US-AndrewMultilingualNeural',
     name: 'Will',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -310,6 +330,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'cgSgspJ2msm6clMCkdW9',
     voiceId: 'cgSgspJ2msm6clMCkdW9',
+    underlyingVoice: 'en-US-AvaMultilingualNeural',
     name: 'Jessica',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -325,6 +346,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'cjVigY5qzO86Huf0OWal',
     voiceId: 'cjVigY5qzO86Huf0OWal',
+    underlyingVoice: 'en-US-BrianMultilingualNeural',
     name: 'Eric',
     gender: 'Male',
     lang: 'English / Multilingual',
@@ -340,6 +362,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'hpp4J3VqNfWAUOO0d1Us',
     voiceId: 'hpp4J3VqNfWAUOO0d1Us',
+    underlyingVoice: 'en-US-EmmaMultilingualNeural',
     name: 'Bella',
     gender: 'Female',
     lang: 'English / Multilingual',
@@ -355,6 +378,7 @@ export const ELEVENLABS_VOICES = [
   {
     id: 'iP95p4xoKVk53GoZ742B',
     voiceId: 'iP95p4xoKVk53GoZ742B',
+    underlyingVoice: 'en-US-BrianMultilingualNeural',
     name: 'Chris',
     gender: 'Male',
     lang: 'English / Multilingual',
