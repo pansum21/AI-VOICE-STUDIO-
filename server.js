@@ -1307,6 +1307,9 @@ if (!isVercel) {
     }
   });
 
+  // Keep process alive indefinitely across background task detach
+  setInterval(() => {}, 1000 * 60 * 60);
+
   server.listen(PORT, () => {
     console.log(`\n======================================================`);
     console.log(`  FREE AI VOICE STUDIO IS RUNNING!`);
